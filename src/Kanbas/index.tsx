@@ -7,6 +7,7 @@ import Courses from "./Courses";
 export default function Kanbas() {
   return (
     <div id="wd-kanbas">
+      <h1>Kanbas</h1>
       <table>
         <tr>
           <td valign="top">
@@ -14,7 +15,6 @@ export default function Kanbas() {
           </td>
 
           <td valign="top">
-            <h1>Kanbas</h1>
             <Routes>
               <Route path="/" element={<Navigate to="Account" />} />
               <Route path="/Account/*" element={<Account />} />

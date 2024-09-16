@@ -62,7 +62,7 @@ export default function Lab1() {
                 </ol>
 
                 <h5>Unordered List Tag</h5>
-                My favorite books (in no particular order)
+                Dr. Annunziato's favorite books (in no particular order)
                 <ul id="wd-my-books">
                     <li>Dune</li>
                     <li>Lord of the Rings</li>
@@ -71,7 +71,7 @@ export default function Lab1() {
                     <li>The Forever War</li>
                 </ul>
 
-                Your favorite books (in no particular order)
+                My favorite books (in no particular order)
                 <ul id="wd-your-books">
                     <li>Bible</li>
                     <li>Harry Potter Series</li>
