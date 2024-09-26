@@ -1,4 +1,6 @@
 import "./index.css"; 
+
+// 3.1 Styling Webpages with CSS (Cascading Style Sheets)
 import ForegroundColors from "./ForegroundColors";
 import BackgroundColors from "./BackgroundColors";
 import Borders from "./Borders";
@@ -11,12 +13,23 @@ import Zindex from "./Zindex";
 import Float from "./Float";
 import GridLayout from "./GridLayout";
 import Flex from "./Flex";
+
+// 3.2 Decorating Documents with React Icons
 import ReactIconsSampler from "./ReactIcons";
+
+// 3.3 Styling Webpages with the Bootstrap CSS Library
+import BootstrapGrid from "./BootstrapGrid";
+import ScreenSizeLabel from "./ScreenSizeLabel";
+import BootstrapTables from "./BootstrapTables";
+import BootstrapLists from "./BootstrapLists";
+import BootstrapForms from "./BootstrapForms";
+import BootstrapNavigation from "./BootstrapNavigation";
 
 export default function Lab2() {
   return (
 
-    <div id="wd-lab2">
+    <div id="wd-lab2" className="container"> 
+    {/* 3.3.2 Laying out content with containers */}
       <h2>Lab 2 - Cascading Style Sheets</h2>
       <h3>Styling with the STYLE attribute</h3>
 
@@ -114,7 +127,7 @@ export default function Lab2() {
       {/* 3.1.12 Styling dimensions */}
       <Dimensions />
       
-      {/* 3.1.13&14&15 Styling positions (relative, absolute, fixed) */}
+      {/* 3.1.13+14+15 Styling positions (relative, absolute, fixed) */}
       <Positions />
 
       {/* 3.1.16 Styling z-index */}
@@ -131,6 +144,68 @@ export default function Lab2() {
 
       {/* 3.2 Decorating Documents with React Icons */}
       <ReactIconsSampler />
+
+      {/* 3.3.3 Laying out content with grids*/}
+      {/* 3.3.4 Responsive Grids*/}
+      <BootstrapGrid />
+
+      {/* 3.3.5 Hiding and showing responsive content */}
+      <ScreenSizeLabel />
+
+      {/* 3.3.6 Styling tables */}
+      {/* 3.3.7 Making tables responsive */}
+      <BootstrapTables />
+
+      {/* 3.3.8 Styling Lists */}
+      {/* 3.3.9 Styling a List of Hyperlinks */}
+      <BootstrapLists />
+
+      {/* 3.3.10 Basic Form Styling */}
+      {/* 3.3.11 Styling Dropdowns */}
+      {/* 3.3.12 Styling Switches */}
+      {/* 3.3.13 Styling Range and Sliders */}
+      {/* 3.3.14 Styling Addons */}
+      {/* 3.3.15 Responsive Forms */}
+      <BootstrapForms />
+
+      {/* 3.3.16 Navigating with Tabs */}
+      {/* 3.3.17 Navigating with Pills - see TOC.tsx*/}
+      {/* 3.3.18 Navigating with cards */}
+      <BootstrapNavigation />
+
+
+      {/* 3.3.19 Bootstrap positions, margins and paddings */}
+      {/* 
+      m stands for margin, p stands for padding, t for top, b for bottom, 
+      s for start, e for end. Integers are sizes.
+
+      Posotions:
+      position-absolute, position-relative,
+      position-fixed, position-sticky
+      top, bottom, start, end,
+      top-0, top-50, top-100,
+      bottom-0, bottom-50, bottom-100,
+      start-0, start-50, start-100,
+      end-0, end-50, end-100,
+
+      Margins:
+      mt-0	mb-0	ms-0	me-0
+      mt-1	mb-1	ms-1	me-1
+      mt-2	mb-2	ms-2	me-2
+      ...	  ...	  ...	  ...
+      mt-5	mb-5	ms-5	me-5
+      mt-auto	ms-auto
+      mb-auto	me-auto
+
+      Paddings:
+      pt-0	pb-0	ps-0	me-0
+      pt-1	pb-1	ps-1	me-1
+      pt-2	pb-2	ps-2	me-2
+      ...	  ...	   ...	 ...
+      pt-5	pb-5	ps-5	me-5
+      pt-auto		ps-auto
+      pb-auto	pe-auto
+      */}
 
     </div>
   );
