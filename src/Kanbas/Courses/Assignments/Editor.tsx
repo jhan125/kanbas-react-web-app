@@ -1,168 +1,269 @@
+import "./styles.css"
+import "bootstrap/dist/css/bootstrap.min.css";
+
 export default function AssignmentEditor() {
   return (
-    <div id="wd-assignments-editor">
-      <label htmlFor="wd-name">Assignment Name</label>
-      <br />
-      <input id="wd-name" value="A1 - ENV + HTML" />
-      <br /><br />
+    <div className="container mt-4" id="wd-assignments-editor">
 
-      <textarea id="wd-description" cols={30} rows={10}>
-        The assignment is available online. Submit a link to the landing page of your web application running on Netlify. The landing page should include the following: Your full name and section links to each of the lab assignmnets Link to the Kanbas application Links to all relevant source code repositories The Kanbas application should include a link to navigate back to the landing page.
-      </textarea>
-      <br />
-      <br />
+      <form>
 
-      <table>
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-points">Points</label>
-          </td>
-          <td>
-            <input id="wd-points" value={100} />
-          </td>
-        </tr>
-        <br />
+        <div className="row mb-3">
+          <label htmlFor="wd-name" className="col-form-label">
+            Assignment Name
+          </label>
+          <div className="col-sm-10">
+            <input
+              type="text"
+              id="wd-name"
+              value="A1"
+              className="form-control"
+            />
+          </div>
+        </div>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-group">Assignment Group</label>
-          </td>
-          <td>
-            <select id="wd-group">
-              <option selected value="ASSIGNMENTS">ASSIGNMENTS</option>
-              <option value="O1">Option1</option>
-              <option value="O2">Option2</option>
-              <option value="O3">Option3</option>
-            </select>
-          </td>
-        </tr>
-        <br />
+        <div className="mb-3 row">
+          <div className="col-sm-10">
+            <div id="wd-description" className="p-3 border">
+              <p>
+                The assignment is
+                <span className="text-danger"> available online</span>
+              </p>
+              <p>
+                Submit a link to the landing page of your Web application
+                running on Netlify.
+              </p>
+              <p>The landing page should include the following:</p>
+              <ul>
+                <li>Your full name and section</li>
+                <li>Links to each of the lab assignments</li>
+                <li>Link to the Kanbas application</li>
+                <li>Links to all relevant source code repositories</li>
+              </ul>
+              <p>
+                The Kanbas application should include a link to navigate back to
+                the landing page.
+              </p>
+            </div>
+          </div>
+        </div>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-display-grade-as">Display Grade as</label>
-          </td>
-          <td>
-            <select id="wd-display-grade-as">
-              <option selected value="P0">Percentage</option>
-              <option value="O1">Option1</option>
-              <option value="O2">Option2</option>
-              <option value="O3">Option3</option>
-            </select>
-          </td>
-        </tr>
-        <br />
+        <div className="row mb-3">
+          <div className="col-sm-10">
+            <div className="row mb-3">
+              <label
+                htmlFor="wd-points"
+                className="col-sm-4 col-form-label text-end">
+                Points
+              </label>
+              <div className="col-sm-8">
+                <input
+                  type="number"
+                  id="wd-points"
+                  defaultValue={100}
+                  className="form-control"
+                />
+              </div>
+            </div>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-submission-type">Submission Type</label>
-          </td>
-          <td>
-            <select id="wd-submission-type">
-              <option selected value="Online">Online</option>
-              <option value="O1">Option1</option>
-              <option value="O2">Option2</option>
-              <option value="O3">Option3</option>
-            </select>
-          </td>
-        </tr>
-        <br />
+            <div className="row mb-3">
+              <label
+                htmlFor="wd-group"
+                className="col-form-label col-sm-4 text-end">
+                Assignment Group
+              </label>
+              <div className="col-sm-8 dflex">
+                <select id="wd-group" className="form-select">
+                  <option selected value="ASSIGNMENTS">ASSIGNMENTS</option>
+                  <option value="O1">Option1</option>
+                  <option value="O2">Option2</option>
+                  <option value="O3">Option3</option>
+                </select>
+              </div>
+            </div>
 
-        <tr>
-          <br />
-          <td align="right" valign="top">
-            <td align="left" valign="top">
-              <label>Online Entry Options:</label>
-              <br />
-              <input type="checkbox" id="wd-text-entry" value="Text Entry" name="Text Entry" />
-              <label htmlFor="wd-text-entry">Text Entry</label>
-              <br />
-              <input type="checkbox" id="wd-website-url" value="Website Url" name="Website Url" />
-              <label htmlFor="wd-website-url">Website URL</label>
-              <br />
-              <input type="checkbox" id="wd-media-recordings" value="Media Recordings" name="Media Recordings" />
-              <label htmlFor="wd-media-recordings">Media Recordings</label>
-              <br />
-              <input type="checkbox" id="wd-student-annotation" value="Student Annotation" name="Student Annotation" />
-              <label htmlFor="wd-student-annotation">Student Annotation</label>
-              <br />
-              <input type="checkbox" id="wd-file-upload" value="File Uploads" name="File Uploads" />
-              <label htmlFor="wd-file-upload">File Uploads</label>
-            </td>
-          </td>
-        </tr>
-        <br />
+            <div className="row mb-3">
+              <label
+                htmlFor="wd-display-grade-as"
+                className="col-form-label col-sm-4 text-end"
+              >
+                Display Grade as
+              </label>
+              <div className="col-sm-8">
+                <select id="wd-display-grade-as" className="form-select">
+                  <option selected value="P0">Percentage</option>
+                  <option value="O1">Option1</option>
+                  <option value="O2">Option2</option>
+                  <option value="O3">Option3</option>
+                </select>
+              </div>
+            </div>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign-to">Assign</label>
-          </td>
+            <div className="row mb-3">
+              <label
+                htmlFor="wd-submission-type"
+                className="col-form-label col-sm-4 text-end ">
+                Submission Type
+              </label>
+              <div className="col-sm-8">
+                <div className="p-3 border">
+                  <select
+                    id="wd-submission-type"
+                    className="form-select mb-3"
+                  >
+                    <option selected value="Online">Online</option>
+                    <option value="O1">Option1</option>
+                    <option value="O2">Option2</option>
+                    <option value="O3">Option3</option>
+                  </select>
 
-          <td align="left" valign="top">
-            <label>Assign to</label>
-          </td>
+                  <div>
+                    <label
+                      className="col-form-label col-sm-4 mb-3"
+                      style={{ fontWeight: 'bold' }}>
+                      Online Entry Options
+                    </label>
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        id="wd-text-entry"
+                        className="form-check-input" />
+                      <label htmlFor="wd-text-entry" className="form-check-label">
+                        Text Entry
+                      </label>
+                    </div>
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        id="wd-website-url"
+                        className="form-check-input" />
+                      <label
+                        htmlFor="wd-website-url"
+                        className="form-check-label">
+                        Website URL
+                      </label>
+                    </div>
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        id="wd-media-recordings"
+                        className="form-check-input" />
+                      <label
+                        htmlFor="wd-media-recordings"
+                        className="form-check-label">
+                        Media Recordings
+                      </label>
+                    </div>
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        id="wd-student-annotation"
+                        className="form-check-input" />
+                      <label
+                        htmlFor="wd-student-annotation"
+                        className="form-check-label">
+                        Student Annotation
+                      </label>
+                    </div>
+                    <div className="form-check mb-3">
+                      <input
+                        type="checkbox"
+                        id="wd-file-upload"
+                        className="form-check-input" />
+                      <label
+                        htmlFor="wd-file-upload"
+                        className="form-check-label">
+                        File Uploads
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-        </tr>
-        <tr>
-          <td></td>
-          <td align="left" valign="top">
-            <input type="text" value="Everyone" />
-          </td>
-        </tr>
-        <br />
+            <div className="row mb-3 mt-3">
+              <label className="col-form-label text-end col-sm-4">
+                Assign
+              </label>
+              <div className="col-sm-8">
+                <div className="border p-2">
+                  <label
+                    htmlFor="wd-assign-to"
+                    className="col-form-control text-start col-sm-4"
+                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                    Assign to
+                  </label>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign"> </label>
-          </td>
-          <td>
-            <label htmlFor="wd-due-date">Due</label>
-          </td>
-        </tr>
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign"> </label>
-          </td>
-          <td>
-            <input type="date" id="wd-due-date" value="2024-05-13" />
-          </td>
-        </tr>
-        <br />
+                  <input
+                    type="text"
+                    id="wd-assign-to"
+                    value="Everyone"
+                    className="form-control mb-3" />
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign"> </label>
-          </td>
-          <td>
-            <label htmlFor="wd-available-from"> Available from: </label>
-          </td>
-          <td>
-            <label htmlFor="wd-available-until"> Until: </label>
-          </td>
-        </tr>
+                  <label
+                    htmlFor="wd-due-date"
+                    className="form-label"
+                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                    Due
+                  </label>
 
-        <tr>
-          <td align="right" valign="top">
-            <label htmlFor="wd-assign"> </label>
-          </td>
-          <td>
-            <input type="date" id="wd-available-from" value="2024-05-06" />
-          </td>
-          <td>
-            <input type="date" id="wd-available-until" value="2024-05-20" />
-          </td>
-        </tr>
-      </table>
-      <hr />
+                  <input
+                    type="date"
+                    id="wd-due-date"
+                    value="2024-05-13"
+                    className="form-control mb-3" />
 
-      <table align="right">
-        <tr>
-          <td>
-            <button id="wd-cancel" type="button">Cancel</button>
-            <button id="wd-save" type="button">Save</button>
-          </td>
-        </tr>
-      </table>
+                  <div className="row mb-3">
+                    <div className="col-sm-6">
+                      <label
+                        htmlFor="wd-available-from"
+                        className="form-label"
+                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                        Available from
+                      </label>
+                      <input
+                        type="date"
+                        id="wd-available-from"
+                        value="2024-05-06"
+                        className="form-control mb-3"
+                        style={{ flex: "1" }} />
+                    </div>
+
+                    <div className="col-sm-6">
+                      <label
+                        htmlFor="wd-available-until"
+                        className="form-label mb-2"
+                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                        Until
+                      </label>
+                      <input
+                        type="date"
+                        id="wd-available-until"
+                        value="2024-05-20"
+                        className="form-control"
+                      />
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+            <hr />
+
+            <div className="row mb-3">
+              <div className="d-flex justify-content-end">
+
+                <button type="button" className="btn btn-secondary me-2">
+                  Cancel
+                </button>
+                <button type="button" className="btn btn-danger">
+                  Save
+                </button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
     </div>
   );
 }

@@ -1,0 +1,4 @@
+/* The width of the sidebar must be about 110 pixels wide, +/- 5 pixels. */
+#wd-kanbas-navigation {
+  width: 110px;
+}

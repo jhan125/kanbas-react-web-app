@@ -1,0 +1,9 @@
+/*
+Selected (active) links must have a white background with black text
+Non selected links must have a white background with red text
+ */
+#wd-courses-navigation > .list-group-item.active {
+  color: black;
+  background-color: white;
+  border-left: 3px solid black !important;
+}
