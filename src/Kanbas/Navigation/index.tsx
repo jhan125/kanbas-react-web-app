@@ -1,15 +1,25 @@
 import './styles.css'
 import { AiOutlineDashboard } from "react-icons/ai";
 import { IoCalendarOutline, IoSettingsOutline } from "react-icons/io5";
-import { LiaBookSolid } from "react-icons/lia";
+import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
-import { useState } from "react";
+// import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 
 export default function KanbasNavigation() {
   // Reference: https://stackoverflow.com/questions/71336965/how-to-load-active-class-for-link-in-react
   // * Selected (active) links have a white background with red text
   // * Non selected links have a black background with white text
-  const [activeLink, setActiveLink] = useState('');
+  // const [activeLink, setActiveLink] = useState('');
+
+  const { pathname } = useLocation();
+  const links = [
+    { label: "Dashboard", path: "/Kanbas/Dashboard", icon: AiOutlineDashboard },
+    { label: "Courses", path: "/Kanbas/Dashboard", icon: LiaBookSolid },
+    { label: "Calendar", path: "/Kanbas/Calendar", icon: IoCalendarOutline },
+    { label: "Inbox", path: "/Kanbas/Inbox", icon: FaInbox },
+    { label: "Labs", path: "/Labs", icon: LiaCogSolid },
+  ];
 
   return (
     // 4.1 Styling the Kanbas Navigation Sidebar
@@ -37,10 +47,10 @@ export default function KanbasNavigation() {
         <img src="/images/NEU.jpg" width="75px" alt="NEU logo" />
       </a>
 
-      <a
+      {/* <a
         id="wd-account-link"
         href="#/Kanbas/Account"
-        className={`list-group-item text-center border-0 
+        className={`list-group-item text-center border-0 bg-black
           ${activeLink === 'account' ? 'bg-white text-danger' : 'bg-black text-white'}`}
         onClick={() => setActiveLink('account')}>
         <FaRegCircleUser className={`fs-1 ${activeLink === 'account' ? 'text-danger' : 'text-white'}`} />
@@ -101,7 +111,29 @@ export default function KanbasNavigation() {
         <IoSettingsOutline className={`fs-1 ${activeLink === 'labs' ? 'text-danger' : 'text-danger'}`} />
         <br />
         Labs
-      </a>
+      </a> */}
+
+      <Link key="/Kanbas/Account"
+        to="/Kanbas/Account"
+        className={`list-group-item text-center border-0 bg-black
+            ${pathname.includes("Account") ? "bg-white text-danger" : "bg-black text-white"}`}>
+        <FaRegCircleUser
+          className={`fs-1 ${pathname.includes("Account") ? "text-danger" : "text-white"}`} />
+        <br />
+        Account
+      </Link>
+
+      {links.map((link) => (
+        <Link
+          key={link.path}
+          to={link.path}
+          className={`list-group-item bg-black text-center border-0
+              ${pathname.includes(link.label) ? "text-danger bg-white" : "text-white bg-black"}`}>
+          {link.icon({ className: "fs-1 text-danger" })}
+          <br />
+          {link.label}
+        </Link>
+      ))}
 
     </div>
   );

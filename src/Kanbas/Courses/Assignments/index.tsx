@@ -5,8 +5,13 @@ import { GoPlus } from "react-icons/go";
 import { MdOutlineAssignment } from "react-icons/md";
 import LessonControlButtons from "../Modules/LessonControlButtons";
 import AssignmentControls from "./AssignmentControls";
+import * as db from "../../Database";
+import { useParams } from "react-router";
 
 export default function Assignment() {
+  const { cid } = useParams();
+  const assignments = db.assignments.filter((assignment) => assignment.course === cid);
+
   return (
     <div id="wd-assignments">
       <AssignmentControls /><br /><br /><br /><br />
@@ -19,13 +24,13 @@ export default function Assignment() {
             <BsGripVertical className="me-2 fs-3" />
 
             <FaSortDown className="mb-3" />
-            
+
             <strong className="mx-2 mb-2">ASSIGNMENTS</strong>
 
             <IoEllipsisVertical className="float-end mt-2 mx-1 " />
 
             <GoPlus className="float-end mt-2 mx-1" />
-        
+
             <button className="btn float-end btn-light btn-outline-secondary rounded-pill text-black mx-2">
               40% of Total
             </button>
@@ -33,7 +38,46 @@ export default function Assignment() {
           </div>
 
           {/* border to the left of the line items must be rendered green  */}
-          <ul
+          {assignments.map((assignment) => {
+            let points = 100;
+
+            return (
+              <ul
+                key={assignment._id}
+                className="wd-lessons list-group rounded-0"
+                style={{
+                  borderLeftWidth: "thick",
+                  borderLeftColor: "green",
+                  borderLeftStyle: "solid",
+                }}
+              >
+                <li className="wd-lesson list-group-item p-0">
+                  <div className="wd-lesson-content p-3 ps-1">
+                    <a
+                      className="wd-assignment-link"
+                      href={`#/Kanbas/Courses/${cid}/Assignments/${assignment._id}`}
+                    >
+                      <BsGripVertical className="me-2 fs-3" />
+                      <MdOutlineAssignment className="me-2 fs-3 icon-green" />
+                      {assignment.title}
+                      <LessonControlButtons />
+                      <br />
+                    </a>
+                    <div className="px-4 mx-5">
+                      <span className="text-danger">Multiple Modules | </span>
+                      <strong>Not available until </strong>
+                      <span>{assignment.availableDate} |</span>
+                      <br />
+                      <strong>Due </strong>
+                      <span>{assignment.dueDate} | {points} pts</span>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            );
+          })}
+
+          {/* <ul
             className="wd-lessons list-group rounded-0"
             style={{
               borderLeftColor: "green",
@@ -123,8 +167,8 @@ export default function Assignment() {
                   <span>May 27 at 11:59pm | 100 pts</span>
                 </div>
               </div>
-            </li>
-          </ul>
+            </li> 
+          </ul> */}
         </li>
       </ul>
     </div>

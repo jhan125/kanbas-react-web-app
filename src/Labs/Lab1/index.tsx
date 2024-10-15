@@ -118,6 +118,48 @@ export default function Lab1() {
                             <td>2/17/21</td>
                             <td>95</td>
                         </tr>
+                        <tr>
+                            <td>Q4</td>
+                            <td>Java</td>
+                            <td>3/17/21</td>
+                            <td>97</td>
+                        </tr>
+                        <tr>
+                            <td>Q5</td>
+                            <td>C</td>
+                            <td>4/17/21</td>
+                            <td>95</td>
+                        </tr>
+                        <tr>
+                            <td>Q6</td>
+                            <td>C++</td>
+                            <td>5/17/21</td>
+                            <td>95</td>
+                        </tr>
+                        <tr>
+                            <td>Q7</td>
+                            <td>TypeScript</td>
+                            <td>6/17/21</td>
+                            <td>95</td>
+                        </tr>
+                        <tr>
+                            <td>Q8</td>
+                            <td>SQL</td>
+                            <td>6/27/21</td>
+                            <td>100</td>
+                        </tr>
+                        <tr>
+                            <td>Q9</td>
+                            <td>Swift</td>
+                            <td>7/17/21</td>
+                            <td>95</td>
+                        </tr>
+                        <tr>
+                            <td>Q10</td>
+                            <td>Go</td>
+                            <td>8/17/21</td>
+                            <td>93</td>
+                        </tr>
                     </tbody>
 
                     {/* Table footer */}
@@ -127,7 +169,7 @@ export default function Lab1() {
                             {/* Data spans 3 columns */}
                             <td colSpan={3}>Average</td>
                             {/* Data for coloumn 4 */}
-                            <td>90</td>
+                            <td>94</td>
                         </tr>
                     </tfoot>
                 </table>

@@ -1,7 +1,17 @@
 import "./styles.css"
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useLocation, useParams } from "react-router";
+import { Link } from "react-router-dom";
+import * as db from "../../Database";
 
 export default function AssignmentEditor() {
+  const { cid } = useParams();
+  const { pathname } = useLocation();
+  const assignmentName = pathname.split("/")[5];
+  const assignments = db.assignments.filter(
+    (assignment) => assignment._id === assignmentName
+  );
+
   return (
     <div className="container mt-4" id="wd-assignments-editor">
 
@@ -11,16 +21,18 @@ export default function AssignmentEditor() {
           <label htmlFor="wd-name" className="col-form-label">
             Assignment Name
           </label>
-          <div className="col-sm-10">
-            <input
-              type="text"
-              id="wd-name"
-              value="A1"
-              className="form-control"
-            />
-          </div>
+          {assignments.map((assignment) => (
+            <div className="col-sm-10">
+              <input
+                type="text"
+                id={`wd-title-${assignment._id}`}
+                value={assignment.title}
+                className="form-control"
+              />
+            </div>
+          ))}
         </div>
-
+        
         <div className="mb-3 row">
           <div className="col-sm-10">
             <div id="wd-description" className="p-3 border">
@@ -45,7 +57,17 @@ export default function AssignmentEditor() {
               </p>
             </div>
           </div>
-        </div>
+        </div> 
+
+        {/* <div className="mb-3 row">
+          <div className="col-sm-10">
+            {assignments.map((assignment) => (
+              <div id="wd-description" className="p-3 border" key={assignment._id}>
+                <p>{assignment.description}</p>
+              </div>
+            ))}
+          </div>
+        </div> */}
 
         <div className="row mb-3">
           <div className="col-sm-10">
@@ -240,6 +262,7 @@ export default function AssignmentEditor() {
                         id="wd-available-until"
                         value="2024-05-20"
                         className="form-control"
+                        style={{ flex: "1" }}
                       />
                     </div>
 
@@ -252,13 +275,19 @@ export default function AssignmentEditor() {
             <div className="row mb-3">
               <div className="d-flex justify-content-end">
 
-                <button type="button" className="btn btn-secondary me-2">
+                <Link
+                  to={`/Kanbas/Courses/${cid}/Assignments`}
+                  className="btn btn-secondary me-2"
+                >
                   Cancel
-                </button>
-                <button type="button" className="btn btn-danger">
-                  Save
-                </button>
+                </Link>
 
+                <Link
+                  to={`/Kanbas/Courses/${cid}/Assignments`}
+                  className="btn btn-primary me-2"
+                >
+                  Save
+                </Link>
               </div>
             </div>
           </div>
