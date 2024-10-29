@@ -5,13 +5,16 @@ export default function Signup() {
     <div id="wd-signup-screen">
 
       <h1>Sign up</h1>
+
       <input
         placeholder="username"
         className="ud-username form-control mb-2" />
+        
       <input
         placeholder="password"
         type="password"
         className="ud-username form-control mb-2" />
+        
       <input
         placeholder="verify password"
         type="password"

@@ -1,7 +1,10 @@
 import Modules from "../Modules";
 import CourseStatus from "./Status";
+import { useSelector } from "react-redux";
 
 export default function Home() {
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+
   return (
     <div id="wd-home"
       /* Got help from TA Srikar Nallapu to modify Dr. Annunziato's code
@@ -12,18 +15,8 @@ export default function Home() {
         <Modules />
       </div>
       <div className="d-none d-md-block wd-flex-grow-1">
-        <CourseStatus />
+        {currentUser.role === "FACULTY" && <CourseStatus />}
       </div>
     </div>
-
-    // previous code from Dr. Annunziato's
-    /* <div id="wd-home" className="d-flex">
-      <div className="flex-fill me-5">
-        <Modules />
-      </div>
-      <div className="d-none d-xl-block">
-        <CourseStatus />
-      </div>
-    </div> */
   );
 }
