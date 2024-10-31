@@ -35,7 +35,7 @@ export default function ModuleEditor({
               placeholder="Module Name"
               onChange={(e) => setModuleName(e.target.value)}
             />
-            
+
           </div>
           <div className="modal-footer">
             <button
@@ -50,7 +50,9 @@ export default function ModuleEditor({
               type="button"
               data-bs-dismiss="modal"
               className="btn btn-danger">
-               {dialogTitle.includes("Edit") ? "Update Module" : "Add Module"}
+              {dialogTitle.includes("Edit")
+                ? "Update Module"
+                : "Add Module"}
             </button>
           </div>
         </div>

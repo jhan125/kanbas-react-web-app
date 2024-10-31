@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 
 export default function DateStateVariable() {
   // initialized to the current date
   const [startDate, setStartDate] = useState(new Date());
+
   // convert a Date object into the YYYY-MM-DD format 
   const dateObjectToHtmlDateString = (date: Date) => {
     return `${date.getFullYear()}-${date.getMonth() + 1 < 10 ? 0 : ""}${

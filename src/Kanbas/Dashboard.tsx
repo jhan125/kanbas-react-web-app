@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
-import { useSelector } from "react-redux";
-import * as db from "./Database";
+import { Link, useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from "react-redux";
+import { useState } from "react";
+import CourseItem from "./Courses/CourseItem";
+import DeleteConfirmationModal from "./Courses/Components/DeleteConfirmationModal";
 
 export default function Dashboard(
   {
@@ -19,17 +21,77 @@ export default function Dashboard(
     updateCourse: () => void;
   }) {
 
+  // get current user and enrollments from Redux
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const { enrollments } = db;
+  const enrollments = useSelector((state: any) => state.enrollmentsReducer.enrollments);
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  // user roles
+  const isFaculty = currentUser.role === "FACULTY";
+  const isStudent = currentUser.role === "STUDENT";
+
+  // show enrolled or all available courses for students
+  const [showEnrollments, setShowEnrollments] = useState(true);
+
+  // check if a student is enrolled in a course
+  const isEnrolled = (courseId: string) =>
+    enrollments.some(
+      (enrollment: any) =>
+        enrollment.user === currentUser._id && enrollment.course === courseId
+    );
+
+  // state for delete confirmation modal
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [courseToDelete, setCourseToDelete] = useState<any>(null);
+
+  // open delete confirmation modal
+  const handleDeleteRequest = (course: any) => {
+    setCourseToDelete(course);
+    setShowDeleteModal(true);
+  };
+
+  // confirm delete action
+  const confirmDeleteCourse = () => {
+    if (courseToDelete) {
+      deleteCourse(courseToDelete._id);
+      setShowDeleteModal(false);
+      setCourseToDelete(null);
+    }
+  };
+
+  // close modal
+  const closeDeleteModal = () => {
+    setShowDeleteModal(false);
+    setCourseToDelete(null);
+  };
+
 
   return (
     <div id="wd-dashboard" className="p-4">
-      <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h1 id="wd-dashboard-title">
+          Dashboard
+        </h1>
+        <hr />
 
-      {/* No buttons should be available to non faculty, hide the whole ModuleControlButtons component. */}
-      
-      {currentUser.role === "FACULTY" && (<>
-          {/* 3.1.1 Creating New Courses */}
+        {/* For students: add a blue Enrollment Button at Top Right screen*/}
+        {isStudent && (
+          <button
+            type="button"
+            className="btn btn-primary mb-3 float-end"
+            onClick={() => setShowEnrollments(!showEnrollments)}>
+            {showEnrollments
+              ? "Show All Available Courses"
+              : "Show Enrolled Courses"}
+          </button>
+        )}
+      </div>
+      <hr />
+
+      {/* For Faculty: show add and update courses buttons */}
+      {isFaculty && (
+        <>
           <h5>
             New Course
             <button
@@ -51,103 +113,54 @@ export default function Dashboard(
             value={course.name}
             className="form-control mb-2"
             onChange={(e) => setCourse({ ...course, name: e.target.value })} />
-
           <textarea
             value={course.description}
             className="form-control"
-            onChange={(e) => setCourse({ ...course, description: e.target.value })} />
+            onChange={(e) =>
+              setCourse({ ...course, description: e.target.value })
+            } />
           <hr />
         </>
       )}
-     
-      <h2 id="wd-dashboard-published">
-        Published Courses ({courses.length})
+
+      {/* course count based on user role */}
+      <h2 id="wd-dashboard-courses">
+        {isFaculty
+          ? `Published Courses (${courses.length})`
+          : showEnrollments
+            ? `Enrolled Courses (${courses.filter((course) => isEnrolled(course._id)).length})`
+            : `Available Courses (${courses.length})`}
       </h2>
       <hr />
 
-      <div id="wd-dashboard-courses" className="row">
-        <div className="row row-cols-1 row-cols-md-5 g-4">
-
-          {courses
-            .filter((course) =>
-              currentUser.role === "FACULTY" || 
-              enrollments.some(
-                (enrollment) =>
-                  enrollment.user === currentUser._id &&
-                  enrollment.course === course._id
-              ))
-
-            .map((course) => (
-              <div
-                className="wd-dashboard-course col"
-                style={{ width: "300px" }}
-                key={course._id}>
-
-                <Link
-                  to={`/Kanbas/Courses/${course._id}/Home`}
-                  className="text-decoration-none">
-
-                  <div className="card rounded-3 overflow-hidden">
-                    <img
-                      src={`/images/${course._id}.jpg`}
-                      height={160}
-                      alt={course.name}
-                      onError={(e) => { e.currentTarget.src = "/images/reactjs.jpg"; }} />
-
-                    <div className="card-body">
-                      <span
-                        className="wd-dashboard-course-link"
-                        style={{
-                          textDecoration: "none",
-                          color: "navy",
-                          fontWeight: "bold",
-                        }}>
-                        {course.name}
-                      </span>
-                      <p
-                        className="wd-dashboard-course-title card-text"
-                        style={{ maxHeight: 53, overflow: "hidden" }}>
-                        {course.description}
-                      </p>
-
-                      <Link
-                        to={`/Kanbas/Courses/${course._id}/Home`}
-                        className="btn btn-primary">
-                        Go
-                      </Link>
-
-                      {currentUser.role === "FACULTY" && (
-                        <>
-                          {/* 3.1.2 Deleting A Course */}
-                          <button
-                            onClick={(event) => {
-                              event.preventDefault();
-                              deleteCourse(course._id);
-                            }}
-                            className="btn btn-danger float-end"
-                            id="wd-delete-course-click">
-                            Delete
-                          </button>
-
-                          {/* 3.1.3 Editing A Course */}
-                          <button
-                            onClick={(event) => {
-                              event.preventDefault();
-                              setCourse(course);
-                            }}
-                            className="btn btn-warning me-2 float-end"
-                            id="wd-edit-course-click">
-                            Edit
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </div>
-                </Link>
-              </div>
-            ))}
-        </div>
+      {/* show courses based on enrollments */}
+      <div className="row row-cols-1 row-cols-md-5 g-4">
+        {courses
+          .filter(
+            (course) =>
+              isFaculty || (showEnrollments ? isEnrolled(course._id) : true)
+          )
+          .map((course) => (
+            <CourseItem
+              key={course._id}
+              course={course}
+              currentUser={currentUser}
+              isEnrolled={isEnrolled(course._id)}
+              isStudent={isStudent}
+              deleteCourse={() => handleDeleteRequest(course)}
+              setCourse={setCourse}
+            />
+          ))}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        show={showDeleteModal}
+        title="Confirm Deletion"
+        itemName={courseToDelete?.name || "this course"}
+        onDelete={confirmDeleteCourse}
+        onClose={() => setShowDeleteModal(false)}
+      />
     </div>
   );
 }

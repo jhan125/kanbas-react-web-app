@@ -45,46 +45,38 @@ export default function Kanbas() {
 
   return (
     <Provider store={store}>
-      <div id="wd-kanbas" className="h-100">
+      <div id="wd-kanbas">
+        <KanbasNavigation />
 
-        {/* Fill the vertical space completely with both the sidebar and the main content */}
-        <div className="d-flex h-100">
+        <div className="wd-main-content-offset p-3">
 
-          {/* The whole sidebar must have a black background */}
-          <div className="d-none d-md-block bg-black">
-            <KanbasNavigation />
-          </div>
-
-          <div className="wd-main-content-offset p-3">
-
-            <Routes>
-              {/* The Kanbas Dashboard link must be the default screen when navigating to Kanbas */}
-              <Route path="/" element={<Navigate to="Dashboard" />} />
-              <Route path="/Account/*" element={<Account />} />
-              <Route
-                path="/Dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard
-                      courses={courses}
-                      course={course}
-                      setCourse={setCourse}
-                      addNewCourse={addNewCourse}
-                      deleteCourse={deleteCourse}
-                      updateCourse={updateCourse} />
-                  </ProtectedRoute>} />
-              <Route
-                path="/Courses/:cid/*"
-                element={
-                  <ProtectedRoute>
-                    <Courses courses={courses} />
-                  </ProtectedRoute>} />
-              <Route path="/Calendar" element={<h1>Calendar</h1>} />
-              <Route path="/Inbox" element={<h1>Inbox</h1>} />
-            </Routes>
-          </div>
+          <Routes>
+            {/* Kanbas Dashboard link must be the default screen when navigating to Kanbas */}
+            <Route path="/" element={<Navigate to="Dashboard" />} />
+            <Route path="/Account/*" element={<Account />} />
+            <Route
+              path="/Dashboard"
+              element={
+                <ProtectedRoute>
+                  <Dashboard
+                    courses={courses}
+                    course={course}
+                    setCourse={setCourse}
+                    addNewCourse={addNewCourse}
+                    deleteCourse={deleteCourse}
+                    updateCourse={updateCourse} />
+                </ProtectedRoute>} />
+            <Route
+              path="/Courses/:cid/*"
+              element={
+                <ProtectedRoute>
+                  <Courses courses={courses} />
+                </ProtectedRoute>} />
+            <Route path="/Calendar" element={<h1>Calendar</h1>} />
+            <Route path="/Inbox" element={<h1>Inbox</h1>} />
+          </Routes>
         </div>
       </div>
-    </Provider>
+    </Provider >
   );
 }
