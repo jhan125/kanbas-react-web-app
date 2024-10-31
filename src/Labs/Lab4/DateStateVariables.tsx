@@ -18,7 +18,7 @@ export default function DateStateVariable() {
       <h3>{dateObjectToHtmlDateString(startDate)}</h3>
       <input
         className="form-control"
-        type="date"
+        type="datetime-local"
         value={dateObjectToHtmlDateString(startDate)}
         onChange={(e) => setStartDate(new Date(e.target.value))}
       />
