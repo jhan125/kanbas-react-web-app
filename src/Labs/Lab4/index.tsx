@@ -14,6 +14,8 @@ import HelloRedux from "./ReduxExamples/HelloRedux";
 import CounterRedux from "./ReduxExamples/CounterRedux";
 import AddRedux from "./ReduxExamples/AddRedux";
 import TodoList from "./ReduxExamples/todos/TodoList";
+import App from "../../Q7/App"
+
 
 export default function Lab4() {
   function sayHello() {
@@ -50,6 +52,16 @@ export default function Lab4() {
       <CounterRedux />
       <AddRedux />
       <TodoList />
+
+      {/* X1 exam */}
+      {/* <Fds /> */}
+      {/* <Acme /> */}
+      {/* <Fds d={{ b: "a" }} /> */}
+      {/* <Mnb d={["a"]} /> */}
+      
+       {/* Q7 */}
+      <App />
+
     </div>
   );
 }

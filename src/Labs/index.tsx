@@ -6,6 +6,7 @@ import TOC from "./TOC";
 import { Route, Routes, Navigate } from "react-router";
 import store from "./store";
 import { Provider } from "react-redux";
+import App from "../Q7/App"
 
 export default function Labs() {
   return (
@@ -20,6 +21,7 @@ export default function Labs() {
           <Route path="Lab2" element={<Lab2 />} />
           <Route path="Lab3/*" element={<Lab3 />} />
           <Route path="Lab4/*" element={<Lab4 />} />
+          <Route path="Quiz/*" element={<App />} />
         </Routes>
       </div>
     </Provider>
