@@ -41,7 +41,7 @@ export default function Courses(
             <Route path="Modules" element={<Modules />} />
             <Route path="Piazza" element={<h2>Piazza</h2>} />
             <Route path="Zoom" element={<h2>Zoom</h2>} />
-            <Route path="Assignments" element={<Assignments />} />
+            <Route path="Assignments" element={<Assignments courses={courses}/>} />
             <Route
               path="Assignments/:aid"
               element={<AssignmentEditor  />} />

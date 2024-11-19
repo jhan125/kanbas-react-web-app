@@ -2,8 +2,10 @@ import { Link, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { setCurrentUser } from "./reducer";
+import * as client from "./client";
 
 export default function Profile() {
+
   const [profile, setProfile] = useState<any>({});
 
   const dispatch = useDispatch();
@@ -16,11 +18,24 @@ export default function Profile() {
     setProfile(currentUser);
   };
 
-  const signout = () => {
+  const updateProfile = async () => {
+    const updatedProfile = await client.updateUser(profile);
+    dispatch(setCurrentUser(updatedProfile));
+  };
+
+  const signout = async () => {
+    await client.signout();
     // clear current user in Redux store
     dispatch(setCurrentUser(null));
     navigate("/Kanbas/Account/Signin");
   };
+
+  // React's useEffect hook lets you run side effects 
+  //(like data fetching, subscriptions, or manually updating the DOM) in functional components.
+  // this means fetchProfile function will be executed once, when the component is first rendered
+  useEffect(() => {
+    fetchProfile();
+  }, []);
 
   // helper function to format date to YYYY-MM-DD
   const formatDate = (dateString: string) => {
@@ -30,13 +45,6 @@ export default function Profile() {
     const day = String(date.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
   };
-
-  // React's useEffect hook lets you run side effects 
-  //(like data fetching, subscriptions, or manually updating the DOM) in functional components.
-  // this means fetchProfile function will be executed once, when the component is first rendered
-  useEffect(() => {
-    fetchProfile();
-  }, []);
 
   return (
     <div id="wd-profile-screen">
@@ -98,6 +106,12 @@ export default function Profile() {
           </select>
 
           <button
+            onClick={updateProfile}
+            className="btn btn-primary w-100 mb-2">
+            Update
+          </button>
+
+          <button
             onClick={signout}
             className="btn btn-danger w-100 mb-2"
             id="wd-signout-btn">
@@ -105,7 +119,6 @@ export default function Profile() {
           </button>
         </div>
       )}
-
 
     </div>
   );

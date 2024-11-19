@@ -5,6 +5,7 @@ import AssignmentDeleteModal from "./AssignmentDeleteModal";
 import { deleteAssignment } from "./reducer";
 import { useState } from "react";
 import { useDispatch } from "react-redux";
+import * as assignmentsClient from "./client";
 
 export default function AssignmentControlButtons({
   assignmentId,
@@ -15,27 +16,29 @@ export default function AssignmentControlButtons({
 
   // manage modal visibility and assignment to delete
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
   // open the modal and set target assignment for deletion
   const handleDeleteClick = () => {
-    setDeleteTargetId(assignmentId);
     setShowDeleteModal(true);
   };
 
   // confirm deletion, dispatch action, and close modal
-  const confirmDeleteAssignment = () => {
-    if (deleteTargetId) {
-      dispatch(deleteAssignment(deleteTargetId));
+  const confirmDeleteAssignment = async () => {
+    try {
+      // delete from backend
+      await assignmentsClient.deleteAssignment(assignmentId);
+      console.log("Sucessfully deleted assignment: ", assignmentId);
+      // update redux store
+      dispatch(deleteAssignment(assignmentId));
       setShowDeleteModal(false);
-      setDeleteTargetId(null); // reset the target ID after deletion
+    } catch(error) {
+      console.error("Error in deleting assignment: ", error);
     }
   };
 
   // close the modal without deleting
   const closeModal = () => {
     setShowDeleteModal(false);
-    setDeleteTargetId(null); // reset the target ID when closing
   };
 
   return (
@@ -50,7 +53,7 @@ export default function AssignmentControlButtons({
       {showDeleteModal && (
         <AssignmentDeleteModal
           title="Delete Assignment"
-          assignmentId={deleteTargetId ?? ""}
+          assignmentId={assignmentId}
           deleteAssignment={confirmDeleteAssignment} 
           onClose={closeModal}
         />

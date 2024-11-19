@@ -1,27 +1,40 @@
 import { Link, useParams, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { updateAssignment, addAssignment } from "./reducer";
+import * as assignmentsClient from "./client";
+import { useEffect, useState } from "react";
 
 export default function AssignmentSaveButtons({
   assignmentId,
   title,
-  availableDate,
-  dueDate,
-  availableUntil,
+  availableFrom,
+  due,
+  until,
   points,
   description,
 }: {
   assignmentId: string,
   title: string,
-  availableDate: string,
-  dueDate: string,
+  availableFrom: string,
+  due: string,
   points: number,
   description: string,
-  availableUntil: string
+  until: string
 }) {
   const { cid, aid } = useParams();
+  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+  const existingAssignment = assignments.find((a: any) => a._id === aid);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [assignment, setAssignment] = useState(existingAssignment || {
+    title: "",
+    description: "",
+    points: 0,
+    due: "",
+    availablFrom: "",
+    until: "",
+    course: cid,
+  });
 
   // format date so it displays as "Month Day at Time" 
   const formatDateTimeForDisplay = (dateStr: string) => {
@@ -43,23 +56,38 @@ export default function AssignmentSaveButtons({
     return `${month} ${day} at ${hours}:${minutes}${ampm}`;
   };
 
-  // Handle save button click
-  const handleSave = () => {
-    const updatedAssignment = {
-      _id: aid || new Date().getTime().toString(),
-      title,
-      course: cid || "",
-      availableDate: formatDateTimeForDisplay(availableDate),
-      dueDate: formatDateTimeForDisplay(dueDate),
-      availableUntil: formatDateTimeForDisplay(availableUntil),
-      points,
-      description,
-    };
+  const createAssignment = async (assignment: any) => {
+    const newAssignment = await assignmentsClient.createAssignment(cid as string, assignment);
+    dispatch(addAssignment(newAssignment));
+  };
 
-    if (assignmentId) {
-      dispatch(updateAssignment(updatedAssignment));
+  const saveAssignment = async (assignment: any) => {
+    const status = await assignmentsClient.updateAssignment(assignment);
+    dispatch(updateAssignment(assignment));
+  };
+
+  useEffect(() => {
+    if (existingAssignment) {
+      setAssignment(existingAssignment);
+    }
+  }, [existingAssignment]);
+
+  // Handle save button click
+  const handleSave = async () => {
+    if (existingAssignment) {
+      saveAssignment(assignment);
     } else {
-      dispatch(addAssignment(updatedAssignment));
+      const newAssignment = {
+        _id: aid || new Date().getTime().toString(),
+        title,
+        course: cid || "",
+        availableFrom: formatDateTimeForDisplay(availableFrom),
+        due: formatDateTimeForDisplay(due),
+        until: formatDateTimeForDisplay(until),
+        points,
+        description,
+      };
+      createAssignment(newAssignment);
     }
     navigate(`/Kanbas/Courses/${cid}/Assignments`);
   };

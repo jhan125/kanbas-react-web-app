@@ -21,13 +21,13 @@ export default function AssignmentDeleteModal({
               type="button"
               className="btn-close"
               onClick={onClose}
-              aria-label="Close"
-            ></button>
+              aria-label="Close">
+            </button>
           </div>
 
           {/* body */}
           <div className="modal-body">
-            <p>Are you sure you want to delete "{assignmentId}"?</p>
+            <p>Are you sure you want to delete this assignment?</p>
           </div>
 
           {/* footer */}

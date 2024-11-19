@@ -31,16 +31,16 @@ export default function DeleteConfirmationModal({
 
           {/* Modal Body */}
           <div className="modal-body">
-            <p>Are you sure you want to delete "{itemName}"?</p>
+            <p>Are you sure you want to delete/drop "{itemName}"?</p>
           </div>
 
           {/* Modal Footer */}
           <div className="modal-footer">
             <button type="button" className="btn btn-secondary" onClick={onClose}>
-              Cancel
+              No
             </button>
             <button type="button" className="btn btn-danger" onClick={onDelete}>
-              Delete
+              Yes
             </button>
           </div>
         </div>

@@ -2,9 +2,10 @@ import "./styles.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useParams, useNavigate } from "react-router";
 import { useSelector, useDispatch } from "react-redux";
-import { useState } from "react";
-import AssignmentsSaveButtons from "./AssignmentSaveButtons";
+import { useEffect, useState } from "react";
 import { addAssignment, updateAssignment } from "./reducer";
+import * as assignmentsClient from "./client";
+import { Link } from "react-router-dom";
 
 export default function AssignmentEditor() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
@@ -15,15 +16,22 @@ export default function AssignmentEditor() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // get assignments from Redux store and find the current assignment by ID
-  const { assignments } = useSelector((state: any) => state.assignmentsReducer);
-  const assignment = assignments.find((a: any) => a._id === aid);
+  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+  const existingAssignment = assignments.find((a: any) => a._id === aid);
 
+  const [assignment, setAssignment] = useState(existingAssignment || {
+    title: "",
+    description: "",
+    points: 0,
+    due: "",
+    availableFrom: "",
+    until: "",
+    course: cid,
+  });
 
   const formatDateTime = (dateStr: string) => {
     // parse date string in the format "Month Day at Time" 
     if (!dateStr) return "";
-
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) return ""; // Handle invalid date
 
@@ -43,47 +51,57 @@ export default function AssignmentEditor() {
     return `${year}-${month}-${day}T${hours}:${minutes}`;
   };
 
-  // track form inputs
-  const [title, setTitle] = useState(assignment ? assignment.title : "New Assignment");
-  const [description, setDescription] = useState(assignment ? assignment.description : "New Assignment Description");
-  const [points, setPoints] = useState(assignment ? assignment.points : 100);
-  const [dueDate, setDueDate] = useState(formatDateTime(assignment ? assignment.dueDate : ""));
-  const [availableDate, setAvailableDate] = useState(formatDateTime(assignment ? assignment.availableDate : ""));
-  const [availableUntil, setAvailableUntil] = useState(formatDateTime(assignment ? assignment.availableUntil : ""));
-
-  // when click "save", updateor add an assignment based on existence of assignment
-  const handleSave = () => {
-    if (assignment) { // if this assignment already exists
-      dispatch(
-        updateAssignment({
-          _id: aid,
-          title,
-          course: cid,
-          availableDate: availableDate,
-          dueDate: dueDate,
-          points,
-          description,
-          availableUntil
-        })
-      );
-    } else { // if not exists, add a new assignment
-      const newAssignmentId = new Date().getTime().toString();
-      dispatch(
-        addAssignment({
-          _id: newAssignmentId,
-          title,
-          course: cid,
-          availableDate: availableDate,
-          dueDate: dueDate,
-          points,
-          description,
-          availableUntil
-        })
-      );
-      navigate(`/Kanbas/Courses/${cid}/Assignments/${newAssignmentId}`);
-    }
-    navigate(`/Kanbas/Courses/${cid}/Assignments`);
+  const createAssignment = async (assignment: any) => {
+    const newAssignment = await assignmentsClient.createAssignment
+      (cid as string, assignment);
+    dispatch(addAssignment(newAssignment));
   };
+
+  const saveAssignment = async (assignment: any) => {
+    const status = await assignmentsClient.updateAssignment
+      (assignment);
+    dispatch(updateAssignment(assignment));
+  };
+
+  useEffect(() => {
+    if (existingAssignment) {
+      setAssignment(existingAssignment);
+    }
+  }, [existingAssignment]);
+
+  const handleChange = (e: any) => {
+    const { name, value, type, checked } = e.target;
+    const fieldValue = type === "checkbox" ? checked : value;
+
+    setAssignment({ ...assignment, [name]: value });
+  };
+
+  // Handle save button click
+  const handleSave = () => {
+    try {
+      if (existingAssignment) {
+        saveAssignment(assignment);
+        console.log("updated assignment: ", assignment)
+      } else {
+        const newAssignment = {
+          ...assignment, // Spread the existing `assignment` state
+          _id: aid || new Date().getTime().toString(),
+          title: assignment.title,
+          course: cid || "",
+          availableFrom: assignment.availableFrom ? formatDateTime(assignment.availableFrom) : "",
+          due: assignment.due ? formatDateTime(assignment.due) : "",
+          until: assignment.until ? formatDateTime(assignment.until) : "",
+          points: assignment.points,
+          description: assignment.description,
+        };
+        createAssignment(newAssignment);
+        console.log("created assignment: ", assignment)
+      }
+      navigate(`/Kanbas/Courses/${cid}/Assignments`);
+    } catch (error) {
+      console.error("Error when saving assignment: ", error);
+    }
+  }
 
   return (
     <div className="container mt-4" id="wd-assignments-editor">
@@ -99,10 +117,11 @@ export default function AssignmentEditor() {
           <div className="col-sm-10">
             <input
               id="wd-assigment-name"
+              name="title"
               className="form-control"
-              placeholder={title}
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              placeholder={assignment.title}
+              value={assignment.title}
+              onChange={handleChange}
               readOnly={!isFaculty}
             />
           </div>
@@ -111,12 +130,13 @@ export default function AssignmentEditor() {
         <div className="mb-3 row">
           <div className="col-sm-10">
             <textarea
+              name="description"
               className="form-control"
               id="wd-description"
               rows={10}
               placeholder="Assignment description..."
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              value={assignment.description}
+              onChange={handleChange}
               readOnly={!isFaculty} />
           </div>
         </div>
@@ -131,12 +151,13 @@ export default function AssignmentEditor() {
               </label>
               <div className="col-sm-8">
                 <input
+                  name="points"
                   type="number"
                   className="form-control"
                   id="wd-points"
-                  placeholder={String(points)}
-                  value={points}
-                  onChange={(e) => setPoints(Number(e.target.value))}
+                  placeholder={"Enter points"}
+                  value={assignment.points}
+                  onChange={handleChange}
                   readOnly={!isFaculty}
                 />
               </div>
@@ -208,10 +229,13 @@ export default function AssignmentEditor() {
                         <input
                           type="checkbox"
                           id={`wd-${label.toLowerCase().replace(" ", "-")}`}
+                          name={label.replace(" ", "")} // e.g., 'TextEntry', 'WebsiteURL'
                           className="form-check-input"
                           disabled={!isFaculty}
                         />
-                        <label htmlFor={`wd-${label.toLowerCase().replace(" ", "-")}`} className="form-check-label">
+                        <label
+                          htmlFor={`wd-${label.toLowerCase().replace(" ", "-")}`}
+                          className="form-check-label">
                           {label}
                         </label>
                       </div>
@@ -307,23 +331,6 @@ export default function AssignmentEditor() {
                     className="form-control text-start col-sm-4 p-2"
                     readOnly={!isFaculty} />
 
-                  {/* <div className="border p-2">
-                    <div
-                      className="d-flex justify-content-between align-items-center"
-                      style={{
-                        backgroundColor: "#F0F0F0",
-                        width: "130px",
-                        height: "40px",
-                        borderRadius: "5px",
-                      }}
-                    >
-                      <p className="m-3">Everyone</p>
-                      <div className="m-2">
-                        <RxCross2 />
-                      </div>
-                    </div>
-                  </div> */}
-
                   <label
                     htmlFor="wd-due-date"
                     className="col-form-control text-start col-sm-4 p-2"
@@ -332,11 +339,12 @@ export default function AssignmentEditor() {
                   </label>
 
                   <input
+                    name="due"
                     type="datetime-local"
                     id="wd-due-date"
                     className="form-control date-input"
-                    value={dueDate}
-                    onChange={(e) => setDueDate(e.target.value)}
+                    value={assignment.due}
+                    onChange={handleChange}
                     readOnly={!isFaculty} />
 
                   <div className="row mb-3">
@@ -348,12 +356,13 @@ export default function AssignmentEditor() {
                         Available from
                       </label>
                       <input
+                        name="availableFrom"
                         type="datetime-local"
                         id="wd-available-from"
                         className="form-control date-input wd-assignment-date"
                         style={{ flex: "1" }}
-                        value={availableDate}
-                        onChange={(e) => setAvailableDate(e.target.value)}
+                        value={assignment.availableFrom}
+                        onChange={handleChange}
                         readOnly={!isFaculty} />
                     </div>
 
@@ -365,10 +374,11 @@ export default function AssignmentEditor() {
                         Until
                       </label>
                       <input
+                        name="until"
                         type="datetime-local"
                         id="wd-available-until"
-                        value={availableUntil}
-                        onChange={(e) => setAvailableUntil(e.target.value)}
+                        value={assignment.until}
+                        onChange={handleChange}
                         className="form-control date-input"
                         style={{ flex: "1" }}
                         readOnly={!isFaculty}
@@ -380,19 +390,26 @@ export default function AssignmentEditor() {
             </div>
             <hr />
 
-            {/* {isFaculty &&
-              <AssignmentsSaveButtons onSave={handleSave} />} */}
-
             {isFaculty && (
-              <AssignmentsSaveButtons
-                assignmentId={assignment}
-                title={title}
-                availableDate={availableDate}
-                dueDate={dueDate}
-                availableUntil={availableUntil}
-                points={points}
-                description={description}
-              />
+              <div id="wd-modules-controls" className="text-nowrap">
+                <button
+                  type="button"
+                  id="wd-add-module-btn"
+                  className="btn btn-lg btn-danger me-1 float-end"
+                  onClick={handleSave}
+                >
+                  Save
+                </button>
+                <Link to={`/Kanbas/Courses/${cid}/Assignments`}>
+                  <button
+                    type="button"
+                    id="wd-add-module-btn"
+                    className="btn btn-lg btn-secondary me-1 float-end"
+                  >
+                    Cancel
+                  </button>
+                </Link>
+              </div>
             )}
 
           </div>

@@ -5,15 +5,55 @@ import { GoPlus } from "react-icons/go";
 import AssignmentControls from "./AssignmentControls";
 import TaskControlButtons from "./TaskControlButtons";
 import { useParams } from "react-router";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import AssignmentControlButtons from "./AssignmentControlButtons";
+import * as courseClient from "../client";
+import { setAssignments, addAssignment, updateAssignment, deleteAssignment } from "./reducer";
+import { useEffect } from "react";
+import * as assignmentClient from "./client";
 
-export default function Assignments() {
+export default function Assignments(
+  { courses
+  }: {
+    courses: any[];
+  }) {
   const { cid } = useParams();
+  const course = courses.find((course) => course._id === cid);
   const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
-
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const isFaculty = currentUser.role === "FACULTY";
+  const dispatch = useDispatch();
+
+  const fetchAssignments = async () => {
+    const assignments = await courseClient.findAssignmentsForCourse(cid as string);
+    dispatch(setAssignments(assignments));
+  };
+  useEffect(() => {
+    fetchAssignments();
+  }, [cid]);
+
+  const removeAssignment = async (assignmentId: string) => {
+    await assignmentClient.deleteAssignment(assignmentId);
+    dispatch(deleteAssignment(assignmentId));
+  };
+
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return ""; // invalid date
+
+    // extract individual components
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const day = date.getDate();
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    // AM/PM for 12-hour format
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12 for midnight
+
+    // format string
+    return `${month} ${day} at ${hours}:${minutes}${ampm}`;
+  };
 
   return (
     <div className="d-flex" id="wd-assignments">
@@ -26,17 +66,17 @@ export default function Assignments() {
             <li className="wd-assignments list-group-item p-0 mb-5 fs-5 border-gray">
 
               <div className="wd-assignments-title p-4 ps-2 bg-secondary">
-                
+
                 {/* Only faculty can manage modules' sequences */}
-                {isFaculty &&
+                {currentUser.role === "FACULTY" &&
                   (<BsGripVertical className="me-2 fs-3" />)}
-                  
+
                 <FaSortDown className="mb-3 me-2" />
 
                 <strong className="mx-2 mb-2">ASSIGNMENTS</strong>
 
                 {/* Only faculty can see assignments percentage */}
-                {isFaculty && (
+                {currentUser.role === "FACULTY" && (
                   <>
                     <IoEllipsisVertical className="float-end mt-2 mx-1 " />
                     <GoPlus className="float-end mt-2 mx-1" />
@@ -88,12 +128,14 @@ export default function Assignments() {
                             |
                             <span className="text-muted m-2">
                               <strong> Not available until  </strong>
-                              {assignment.availableDate}
+                              {/* {assignment.availableFrom} */}
+                              {formatDateTime(assignment.availableFrom)}
                             </span>
                             |
                             <span className="text-muted m-2">
                               <strong> Due </strong>
-                              {assignment.dueDate}
+                              {/* {assignment.due} */}
+                              {formatDateTime(assignment.due)}
                             </span>
                             |
                             <span className="text-muted m-2">
@@ -104,7 +146,7 @@ export default function Assignments() {
                         </div>
                       </div>
 
-                      {isFaculty &&
+                      {currentUser.role === "FACULTY" &&
                         (<AssignmentControlButtons
                           assignmentId={assignment._id} />)
                       }
