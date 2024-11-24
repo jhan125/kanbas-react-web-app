@@ -37,7 +37,7 @@ export default function Kanbas() {
     }
     let courses = [];
     try {
-      courses = await userClient.findMyCourses(currentUser);
+      courses = await courseClient.fetchAllCourses();
       console.log("Fetched courses:", courses); // Debug
     } catch (error) {
       console.error("Error fetching courses:", error);

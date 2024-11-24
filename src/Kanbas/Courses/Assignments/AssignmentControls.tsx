@@ -4,7 +4,7 @@ import "./styles.css";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { addAssignment } from "./reducer";
-import * as courseClient from "../client";
+import * as assignmentClient from "./client";
 
 export default function AssignmentsControls() {
   const { cid } = useParams();
@@ -27,7 +27,7 @@ export default function AssignmentsControls() {
         availableFrom: "2025-05-09",
         until: "2025-05-10",
     }
-    const assignment = await courseClient.createAssignmentForCourse(cid, newAssignment);
+    const assignment = await assignmentClient.createAssignment(cid, newAssignment);
 
     navigate(`/Kanbas/Courses/${cid}/Assignments/${newAssignment._id}`);
     dispatch(addAssignment(assignment));

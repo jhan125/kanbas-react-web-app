@@ -1,0 +1,19 @@
+.wd-people-details {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+hr {
+  margin-top: 10px; /* Reduces the margin above the horizontal line */
+  margin-bottom: 10px; /* Reduces the margin below the horizontal line */
+}
+
+.button-container {
+  margin-top: 10px; /* Brings the buttons closer to the above section */
+}
+
+.wd-cancel,
+.wd-delete {
+  margin: 0 5px; /* Adds space between the buttons */
+}

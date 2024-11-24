@@ -20,7 +20,7 @@ export default function Modules() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
 
   const fetchModules = async () => {
-    const modules = await coursesClient.findModulesForCourse(cid as string);
+    const modules = await modulesClient.findModulesForCourse(cid as string);
     dispatch(setModules(modules));
   };
   useEffect(() => {
@@ -30,7 +30,7 @@ export default function Modules() {
   const createModuleForCourse = async () => {
     if (!cid) return;
     const newModule = { name: moduleName, course: cid };
-    const module = await coursesClient.createModuleForCourse(cid, newModule);
+    const module = await modulesClient.createModule(cid, newModule);
     dispatch(addModule(module));
   };
 
