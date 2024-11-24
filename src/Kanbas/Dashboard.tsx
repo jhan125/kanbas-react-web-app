@@ -32,12 +32,25 @@ export default function Dashboard(
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   console.log("Current user in Redux:", currentUser);
 
+  // user roles
+  const isFaculty = currentUser.role === "FACULTY";
+  const isStudent = currentUser.role === "STUDENT";
+
+  // if user.role == FACULTY
+  // 1. call a function to fetch all courses, or just use the courses passed in.
+  // 
+
+
+  // 
+  // if user.role == STUDENT
+  // 
   const [showAllCourses, setShowAllCourses] = useState(false);
 
   const displayUnenrolledCourses = async () => {
     fetchUnenrolledCourses();
     console.log(showAllCourses);
   };
+
   useEffect(() => {
     if (showAllCourses) {
       displayUnenrolledCourses();
@@ -109,6 +122,7 @@ export default function Dashboard(
   return (
     <div id="wd-dashboard">
       <h1 id="wd-dashboard-title">Dashboard</h1> <hr />
+
       {currentUser.role === "FACULTY" &&
         <div>
           <h5>New Course

@@ -30,6 +30,30 @@ export default function Kanbas() {
     description: "New Description"
   });
 
+  // fetchAllCourses()
+  //    server API GET server_ip/api/courses
+  // fetchEnrolledCourses(userid: string)
+  //    server API GET server_ip/api/users/:userId/courses
+  // fetchUnEnrolledCourses 
+  //   GET /api/users/:userId/courses/enroll
+  // Dashboard
+  //    courses
+  //    enrolledCourses
+  //    unerolledCourses
+  //    fetchAllCourses()
+  //    fetchEnrolledCourses()
+  //    fetchUnEnrolledCourses()
+  //    
+  //    Courses section
+  //    if user is faculty
+  //       <p> All Courses </p>
+  //       call fetchAllCourses()
+  //    if user is student
+  //       <p> Enrolled Courses </p>
+  //       call fetchEnrolledCourses
+  //    <btn> Unenrolled courses </btn>
+  //       redirect to a page
+
   const fetchCourses = async () => {
     if (!currentUser || !currentUser._id) {
       console.warn("User is not logged in or _id is missing");
@@ -37,7 +61,12 @@ export default function Kanbas() {
     }
     let courses = [];
     try {
-      courses = await userClient.findMyCourses(currentUser);
+      if (currentUser.role === "FACULTY") {
+        courses = await courseClient.fetchAllCourses();
+      } else {
+        courses = await userClient.findMyCourses(currentUser);
+      }
+      
       console.log("Fetched courses:", courses); // Debug
     } catch (error) {
       console.error("Error fetching courses:", error);
