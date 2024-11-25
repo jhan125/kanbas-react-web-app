@@ -186,7 +186,7 @@ export default function Dashboard(
                   <Link to={`/Kanbas/Courses/${course._id}/Home`}
                     className="wd-dashboard-course-link text-decoration-none text-dark" >
                     <img
-                      src={`/images/${course._id}.jpg`}
+                      src={`/images/${course.image}.jpg`}
                       width="100%"
                       height={160}
                       alt={`${course.name} course image`}
@@ -245,7 +245,7 @@ export default function Dashboard(
               <div className="card rounded-3 overflow-hidden">
 
                 <img
-                  src={`/images/${course._id}.jpg`}
+                  src={`/images/${course.image}.jpg`}
                   width="100%"
                   height={160}
                   alt={`${course.name} course image`}

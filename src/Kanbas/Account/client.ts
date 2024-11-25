@@ -72,7 +72,7 @@ export const findMyCourses = async (user: any) => {
 };
 
 export const findUnenrolledCourses = async (user: any) => {
-  const { data } = await axiosWithCredentials.get(`${USERS_API}/${user._id}/courses/enroll`);
+  const { data } = await axiosWithCredentials.get(`${USERS_API}/${user._id}/courses/unenrolled`);
   return data;
 }
 

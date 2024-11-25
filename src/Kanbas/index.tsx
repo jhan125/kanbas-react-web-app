@@ -37,7 +37,11 @@ export default function Kanbas() {
     }
     let courses = [];
     try {
-      courses = await courseClient.fetchAllCourses();
+      if (currentUser.role === "FACULTY") {
+        courses = await courseClient.fetchAllCourses();
+      } else {
+        courses = await userClient.findMyCourses(currentUser);
+      }
       console.log("Fetched courses:", courses); // Debug
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -48,6 +52,12 @@ export default function Kanbas() {
   useEffect(() => {
     fetchCourses();
   }, [currentUser]);
+
+  const fetchEnrolledCourses = async () => {
+    const response = await fetch(`/api/users/${currentUser._id}/courses`);
+    const courses = await response.json();
+    setCourses(courses); // Assume setCourses is used for enrolled courses
+  };  
 
   const fetchUnenrolledCourses = async () => {
     let unenrolledCourses = [];
@@ -122,8 +132,11 @@ export default function Kanbas() {
                 dropCourse={dropCourse}
                 fetchUnenrolledCourses={fetchUnenrolledCourses} />
               </ProtectedRoute>} />
-            <Route path="Courses/:cid/*" element={<ProtectedRoute><Courses
-              courses={courses} /></ProtectedRoute>} />
+            <Route path="Courses/:cid/*"
+              element={<ProtectedRoute>
+                <Courses
+                  courses={courses} />
+              </ProtectedRoute>} />
             <Route path="/Calendar" element={<h1>Calendar</h1>} />
             <Route path="/Inbox" element={<h1>Inbox</h1>} />
           </Routes>
