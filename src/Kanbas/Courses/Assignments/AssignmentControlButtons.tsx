@@ -27,7 +27,7 @@ export default function AssignmentControlButtons({
     try {
       // delete from backend
       await assignmentsClient.deleteAssignment(assignmentId);
-      console.log("Sucessfully deleted assignment: ", assignmentId);
+      console.log("Successfully deleted assignment: ", assignmentId);
       // update redux store
       dispatch(deleteAssignment(assignmentId));
       setShowDeleteModal(false);

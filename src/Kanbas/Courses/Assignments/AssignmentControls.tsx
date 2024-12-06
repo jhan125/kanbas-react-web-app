@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate, useParams } from "react-router-dom";
 import { addAssignment } from "./reducer";
 import * as assignmentClient from "./client";
+import * as userClient from "../../Account/client"
 
 export default function AssignmentsControls() {
   const { cid } = useParams();
@@ -12,24 +13,19 @@ export default function AssignmentsControls() {
   const navigate = useNavigate();
 
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const isFaculty = currentUser.role === "FACULTY";
+  const isFaculty = userClient.canManageCourse(currentUser);
 
   const addNewAssignment = async () => {
     if (!cid) return;
 
     const newAssignment = {
-        _id: new Date().getTime().toString(),
         title: "New Assignment",
-        course: cid,
         description: "New Description",
         points: 100,
-        due: "2025-05-01",
-        availableFrom: "2025-05-09",
-        until: "2025-05-10",
     }
     const assignment = await assignmentClient.createAssignment(cid, newAssignment);
 
-    navigate(`/Kanbas/Courses/${cid}/Assignments/${newAssignment._id}`);
+    navigate(`/Kanbas/Courses/${cid}/Assignments/${assignment._id}`);
     dispatch(addAssignment(assignment));
   }
 

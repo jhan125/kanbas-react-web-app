@@ -1,37 +1,39 @@
 import { useEffect, useState } from "react";
 import { FaCheck, FaUserCircle } from "react-icons/fa";
 import { IoCloseSharp } from "react-icons/io5";
-import { useNavigate, useParams } from "react-router";
-import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
 import * as client from "../../Account/client";
 import { FaPencil } from "react-icons/fa6";
 
-export default function PeopleDetails(
-  { fetchUsers
-  }: {
-    fetchUsers: () => void;
-  }) {
-  const { uid } = useParams();
+interface Props {
+  uid: string;
+  users: any[];
+  updateUsers: (newUsers: any[]) => void;
+  cancelUserClick: () => void;
+}
+
+export default function PeopleDetails(props: Props) {
+  const uid = props.uid;
   const [user, setUser] = useState<any>({});
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [role, setRole] = useState("");
   const [editing, setEditing] = useState(false);
-
-  const navigate = useNavigate();
-
-  const fetchUser = async () => {
-    console.log("PeopleDetails called fetchUser: ", uid);
-    if (!uid) return;
-    const user = await client.findUserById(uid);
-    setUser(user);
-    setName(`${user.firstName} ${user.lastName}`);
-    setEmail(user.email);
-    setRole(user.role);
-  };
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+  const users = props.users;
+  const isAdmin = client.isAdmin(currentUser);
 
   useEffect(() => {
     console.log("PeopleDetails called useEffect: ", uid);
+    const fetchUser = async () => {
+      console.log("PeopleDetails called fetchUser: ", uid);
+      if (!uid) return;
+      const user = await client.findUserById(uid);
+      setUser(user);
+      setName(`${user.firstName} ${user.lastName}`);
+      setEmail(user.email);
+      setRole(user.role);
+    };
     if (uid) fetchUser();
   }, [uid]);
 
@@ -39,9 +41,13 @@ export default function PeopleDetails(
 
   const deleteUser = async (uid: string) => {
     try {
-      await client.deleteUser(uid);
-      fetchUsers();// Notify PeopleTable to refresh the table
-      navigate(-1); // Navigate back
+      const status = await client.deleteUser(uid);
+      console.log("Delete user status: ", status);
+      // Remove user from props.users. So the people table will be refreshed.
+      const updatedUsers = users.filter((user: any) => user._id !== uid);
+      props.updateUsers(updatedUsers);
+      // navigate(-1); // Navigate back
+      props.cancelUserClick();
     } catch (error) {
       console.error("Failed to delete user:", error);
     }
@@ -51,11 +57,13 @@ export default function PeopleDetails(
     const [firstName, lastName] = name.split(" ");
     const updatedUser = { ...user, firstName, lastName, email, role };
     try {
-      await client.updateUser(updatedUser); // Update user on the server
+      const newUser = await client.updateUser(updatedUser); // Update user on the server
       setUser(updatedUser); // Update local copy of the user
       setEditing(false); // Turn off editing
-      fetchUsers(); // Refresh the table
+      // Update the users from the parent users list.
+      props.updateUsers(users.map((u: any) => (u._id === uid ? newUser : u)));
       // navigate(-1); // Navigate back to the PeopleTable
+      props.cancelUserClick();
     } catch (error) {
       console.error("Failed to save user:", error);
     }
@@ -64,8 +72,9 @@ export default function PeopleDetails(
   return (
     <div className="wd-people-details position-fixed top-0 end-0 bottom-0 bg-white p-4 shadow w-25 d-flex flex-column">
       <button
-        onClick={() => navigate(-1)}
-        className="btn position-absolute end-0 top-0 wd-close-details">
+        onClick={() => {props.cancelUserClick()}}
+        className="btn position-absolute end-0 top-0 wd-close-details"
+      >
         <IoCloseSharp className="fs-1" />
       </button>
 
@@ -76,7 +85,7 @@ export default function PeopleDetails(
 
       <div className="flex-grow-1">
         <div className="text-danger fs-4 wd-name">
-          {!editing && (
+          {isAdmin && !editing && (
             <FaPencil
               onClick={() => setEditing(true)}
               className="float-end fs-5 mt-2 wd-edit"
@@ -106,7 +115,6 @@ export default function PeopleDetails(
             />
           )}
         </div>
-
         <b>Roles:</b>
         {!editing ? (
           <span className="wd-roles">{user.role}</span>
@@ -114,7 +122,8 @@ export default function PeopleDetails(
           <select
             className="form-select w-50 wd-edit-role"
             value={role}
-            onChange={(e) => setRole(e.target.value)}>
+            onChange={(e) => setRole(e.target.value)}
+          >
             <option value="STUDENT">Student</option>
             <option value="TA">Assistant</option>
             <option value="FACULTY">Faculty</option>
@@ -122,7 +131,6 @@ export default function PeopleDetails(
           </select>
         )}
         <br />
-
         <b>Email:</b>
         {!editing ? (
           <span className="wd-email">{user.email}</span>
@@ -138,30 +146,31 @@ export default function PeopleDetails(
           />
         )}
         <br />
-
-        <b>Login ID:</b> <span className="wd-login-id">{user.loginId}</span>{" "}
+        <b>Login ID:</b> <span className="wd-login-id">{user.loginId}</span>
         <br />
         <b>Section:</b> <span className="wd-section">{user.section}</span>
         <br />
-        <b>Total Activity:</b> <span className="wd-total-activity">{user.totalActivity}</span>
+        <b>Total Activity:</b><span className="wd-total-activity">{user.totalActivity}</span>
       </div>
 
       <hr className="mt-3" />
       <div className="mt-auto d-flex justify-content-between mt-2">
         <button
-          onClick={() => navigate(-1)}
-          className="btn btn-secondary float-start float-end me-2 wd-cancel">
+          onClick={() => {props.cancelUserClick()}}
+          className="btn btn-secondary float-start float-end me-2 wd-cancel"
+        >
           Cancel
         </button>
 
-        <button
-          onClick={() => deleteUser(uid)}
-          className="btn btn-danger float-end wd-delete">
-          Delete
-        </button>
-
+        {isAdmin && (
+          <button
+            onClick={() => deleteUser(uid)}
+            className="btn btn-danger float-end wd-delete"
+          >
+            Delete
+          </button>
+        )}
       </div>
     </div>
   );
-
 }

@@ -6,60 +6,68 @@ import { useEffect, useState } from "react";
 import { addAssignment, updateAssignment } from "./reducer";
 import * as assignmentsClient from "./client";
 import { Link } from "react-router-dom";
+import * as userClient from "../../Account/client";
 
 export default function AssignmentEditor() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const isFaculty = currentUser.role === "FACULTY";
+  const isFaculty = userClient.canManageCourse(currentUser);
 
   // get course ID and assignment ID from URL
   const { cid, aid } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
+  const assignments = useSelector(
+    (state: any) => state.assignmentsReducer.assignments
+  );
   const existingAssignment = assignments.find((a: any) => a._id === aid);
 
-  const [assignment, setAssignment] = useState(existingAssignment || {
-    title: "",
-    description: "",
-    points: 0,
-    due: "",
-    availableFrom: "",
-    until: "",
-    course: cid,
-  });
+  const [assignment, setAssignment] = useState(
+    existingAssignment || {
+      title: "",
+      description: "",
+      points: 0,
+      due: new Date(0),
+      availableFrom: new Date(0),
+      until: new Date(0),
+      course: cid,
+    }
+  );
 
-  const formatDateTime = (dateStr: string) => {
-    // parse date string in the format "Month Day at Time" 
+  const parseDateStr = (dateStr: string) => {
+    // parse date string in the format "Month Day at Time"
     if (!dateStr) return "";
     const date = new Date(dateStr);
-    if (isNaN(date.getTime())) return ""; // Handle invalid date
+    if (isNaN(date.getTime())) return new Date(0); // Handle invalid date
 
-    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month (MM)
-    const day = date.getDate().toString().padStart(2, '0');           // Day (DD)
-    const year = date.getFullYear();                                  // Year (YYYY)
+    // const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Month (MM)
+    // const day = date.getDate().toString().padStart(2, '0');           // Day (DD)
+    // const year = date.getFullYear();                                  // Year (YYYY)
 
-    let hours = date.getHours();
-    const minutes = date.getMinutes().toString().padStart(2, '0');    // Minutes (MM)
-    const ampm = hours >= 12 ? 'PM' : 'AM';                           // AM/PM
+    // let hours = date.getHours();
+    // const minutes = date.getMinutes().toString().padStart(2, '0');    // Minutes (MM)
+    // const ampm = hours >= 12 ? 'PM' : 'AM';                           // AM/PM
 
-    hours = hours % 12;                                               // Convert to 12-hour format
-    hours = hours ? hours : 12;                                       // Adjust 0 to 12 for midnight
+    // hours = hours % 12;                                               // Convert to 12-hour format
+    // hours = hours ? hours : 12;                                       // Adjust 0 to 12 for midnight
 
     // Construct the final format "MM/DD/YYYY, HH:MM AM/PM"
     // return `${month}/${day}/${year}, ${hours}:${minutes} ${ampm}`;
-    return `${year}-${month}-${day}T${hours}:${minutes}`;
+    return date;
   };
 
   const createAssignment = async (assignment: any) => {
-    const newAssignment = await assignmentsClient.createAssignment
-      (cid as string, assignment);
+    const newAssignment = await assignmentsClient.createAssignment(
+      cid as string,
+      assignment
+    );
+    console.log("Created assignment: ", newAssignment);
     dispatch(addAssignment(newAssignment));
   };
 
   const saveAssignment = async (assignment: any) => {
-    const status = await assignmentsClient.updateAssignment
-      (assignment);
+    const status = await assignmentsClient.updateAssignment(assignment);
+    console.log("Update assignment status: ", status);
     dispatch(updateAssignment(assignment));
   };
 
@@ -72,6 +80,7 @@ export default function AssignmentEditor() {
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     const fieldValue = type === "checkbox" ? checked : value;
+    console.log("[handleChange]: ", fieldValue)
 
     setAssignment({ ...assignment, [name]: value });
   };
@@ -81,37 +90,32 @@ export default function AssignmentEditor() {
     try {
       if (existingAssignment) {
         saveAssignment(assignment);
-        console.log("updated assignment: ", assignment)
+        console.log("updated assignment: ", assignment);
       } else {
         const newAssignment = {
           ...assignment, // Spread the existing `assignment` state
-          _id: aid || new Date().getTime().toString(),
           title: assignment.title,
           course: cid || "",
-          availableFrom: assignment.availableFrom ? formatDateTime(assignment.availableFrom) : "",
-          due: assignment.due ? formatDateTime(assignment.due) : "",
-          until: assignment.until ? formatDateTime(assignment.until) : "",
+          availableFrom: parseDateStr(assignment.availableFrom),
+          due: parseDateStr(assignment.due),
+          until: parseDateStr(assignment.until),
           points: assignment.points,
           description: assignment.description,
         };
         createAssignment(newAssignment);
-        console.log("created assignment: ", assignment)
+        console.log("created assignment: ", assignment);
       }
       navigate(`/Kanbas/Courses/${cid}/Assignments`);
     } catch (error) {
       console.error("Error when saving assignment: ", error);
     }
-  }
+  };
 
   return (
     <div className="container mt-4" id="wd-assignments-editor">
-
       <form>
-
         <div className="mb-3 row">
-          <label
-            htmlFor="wd-name"
-            className="col-form-label">
+          <label htmlFor="wd-name" className="col-form-label">
             Assignment Name
           </label>
           <div className="col-sm-10">
@@ -137,7 +141,8 @@ export default function AssignmentEditor() {
               placeholder="Assignment description..."
               value={assignment.description}
               onChange={handleChange}
-              readOnly={!isFaculty} />
+              readOnly={!isFaculty}
+            />
           </div>
         </div>
 
@@ -146,7 +151,8 @@ export default function AssignmentEditor() {
             <div className="row mb-3">
               <label
                 htmlFor="wd-points"
-                className="col-sm-4 col-form-label text-end">
+                className="col-sm-4 col-form-label text-end"
+              >
                 Points
               </label>
               <div className="col-sm-8">
@@ -166,15 +172,19 @@ export default function AssignmentEditor() {
             <div className="row mb-3">
               <label
                 htmlFor="wd-group"
-                className="col-sm-4 col-form-label text-end">
+                className="col-sm-4 col-form-label text-end"
+              >
                 Assignment Group
               </label>
               <div className="col-sm-8">
                 <select
                   id="wd-group"
                   className="form-select"
-                  disabled={!isFaculty}>
-                  <option selected value="ASSIGNMENTS">ASSIGNMENTS</option>
+                  disabled={!isFaculty}
+                >
+                  <option selected value="ASSIGNMENTS">
+                    ASSIGNMENTS
+                  </option>
                   <option value="O1">Option1</option>
                   <option value="O2">Option2</option>
                   <option value="O3">Option3</option>
@@ -185,15 +195,19 @@ export default function AssignmentEditor() {
             <div className="row mb-3">
               <label
                 htmlFor="wd-display-grade-as"
-                className="col-sm-4 col-form-label text-end">
+                className="col-sm-4 col-form-label text-end"
+              >
                 Display Grade as
               </label>
               <div className="col-sm-8">
                 <select
                   id="wd-display-grade-as"
                   className="form-select"
-                  disabled={!isFaculty}>
-                  <option selected value="Percentage">Percentage</option>
+                  disabled={!isFaculty}
+                >
+                  <option selected value="Percentage">
+                    Percentage
+                  </option>
                   <option value="Points">Points</option>
                 </select>
               </div>
@@ -202,7 +216,8 @@ export default function AssignmentEditor() {
             <div className="row mb-3">
               <label
                 htmlFor="wd-submission-type"
-                className="col-form-label col-sm-4 text-end">
+                className="col-form-label col-sm-4 text-end"
+              >
                 Submission Type
               </label>
               <div className="col-sm-8">
@@ -210,8 +225,11 @@ export default function AssignmentEditor() {
                   <select
                     id="wd-submission-type"
                     className="form-select mb-3"
-                    disabled={!isFaculty}>
-                    <option selected value="Online">Online</option>
+                    disabled={!isFaculty}
+                  >
+                    <option selected value="Online">
+                      Online
+                    </option>
                     <option value="O1">Option1</option>
                     <option value="O2">Option2</option>
                     <option value="O3">Option3</option>
@@ -220,11 +238,17 @@ export default function AssignmentEditor() {
                   <div>
                     <label
                       className="col-form-label col-sm-4 mb-3"
-                      style={{ fontWeight: 'bold' }}
+                      style={{ fontWeight: "bold" }}
                     >
                       Online Entry Options
                     </label>
-                    {["Text Entry", "Website URL", "Media Recordings", "Student Annotation", "File Uploads"].map((label, index) => (
+                    {[
+                      "Text Entry",
+                      "Website URL",
+                      "Media Recordings",
+                      "Student Annotation",
+                      "File Uploads",
+                    ].map((label, index) => (
                       <div className="form-check mb-3" key={index}>
                         <input
                           type="checkbox"
@@ -234,8 +258,11 @@ export default function AssignmentEditor() {
                           disabled={!isFaculty}
                         />
                         <label
-                          htmlFor={`wd-${label.toLowerCase().replace(" ", "-")}`}
-                          className="form-check-label">
+                          htmlFor={`wd-${label
+                            .toLowerCase()
+                            .replace(" ", "-")}`}
+                          className="form-check-label"
+                        >
                           {label}
                         </label>
                       </div>
@@ -312,15 +339,14 @@ export default function AssignmentEditor() {
             </div>
 
             <div className="row mb-3 mt-3">
-              <label className="col-form-label text-end col-sm-4">
-                Assign
-              </label>
+              <label className="col-form-label text-end col-sm-4">Assign</label>
               <div className="col-sm-8">
                 <div className="border p-2">
                   <label
                     htmlFor="wd-assign-to"
                     className="col-form-control text-start col-sm-4 p-2"
-                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                  >
                     Assign to
                   </label>
 
@@ -329,12 +355,14 @@ export default function AssignmentEditor() {
                     id="wd-assign-to"
                     placeholder="Everyone"
                     className="form-control text-start col-sm-4 p-2"
-                    readOnly={!isFaculty} />
+                    readOnly={!isFaculty}
+                  />
 
                   <label
                     htmlFor="wd-due-date"
                     className="col-form-control text-start col-sm-4 p-2"
-                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                    style={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                  >
                     Due
                   </label>
 
@@ -345,14 +373,16 @@ export default function AssignmentEditor() {
                     className="form-control date-input"
                     value={assignment.due}
                     onChange={handleChange}
-                    readOnly={!isFaculty} />
+                    readOnly={!isFaculty}
+                  />
 
                   <div className="row mb-3">
                     <div className="col-sm-6">
                       <label
                         htmlFor="wd-available-from"
                         className="col-form-control text-start col-sm-4 p-2"
-                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                      >
                         Available from
                       </label>
                       <input
@@ -363,14 +393,16 @@ export default function AssignmentEditor() {
                         style={{ flex: "1" }}
                         value={assignment.availableFrom}
                         onChange={handleChange}
-                        readOnly={!isFaculty} />
+                        readOnly={!isFaculty}
+                      />
                     </div>
 
                     <div className="col-sm-6">
                       <label
                         htmlFor="wd-available-until"
                         className="col-form-control text-start col-sm-4 p-2"
-                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}>
+                        style={{ whiteSpace: "nowrap", fontWeight: "bold" }}
+                      >
                         Until
                       </label>
                       <input
@@ -411,7 +443,6 @@ export default function AssignmentEditor() {
                 </Link>
               </div>
             )}
-
           </div>
         </div>
       </form>

@@ -7,34 +7,31 @@ import TaskControlButtons from "./TaskControlButtons";
 import { useParams } from "react-router";
 import { useDispatch, useSelector } from "react-redux";
 import AssignmentControlButtons from "./AssignmentControlButtons";
-import * as courseClient from "../client";
-import { setAssignments, addAssignment, updateAssignment, deleteAssignment } from "./reducer";
+// import * as courseClient from "../client";
+import * as userClient from "../../Account/client";
+import "./styles.css"
+import { setAssignments } from "./reducer";
 import { useEffect } from "react";
 import * as assignmentClient from "./client";
 
-export default function Assignments(
-  { courses
-  }: {
-    courses: any[];
-  }) {
+export default function Assignments() {
   const { cid } = useParams();
-  const course = courses.find((course) => course._id === cid);
   const assignments = useSelector((state: any) => state.assignmentsReducer.assignments);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const dispatch = useDispatch();
 
-  const fetchAssignments = async () => {
-    const assignments = await assignmentClient.findAssignmentsForCourse(cid as string);
-    dispatch(setAssignments(assignments));
-  };
   useEffect(() => {
+    const fetchAssignments = async () => {
+      const assignments = await assignmentClient.findAssignmentsForCourse(cid as string);
+      dispatch(setAssignments(assignments));
+    };
     fetchAssignments();
-  }, [cid]);
+  }, [cid, dispatch]);
 
-  const removeAssignment = async (assignmentId: string) => {
-    await assignmentClient.deleteAssignment(assignmentId);
-    dispatch(deleteAssignment(assignmentId));
-  };
+  // const removeAssignment = async (assignmentId: string) => {
+  //   await assignmentClient.deleteAssignment(assignmentId);
+  //   dispatch(deleteAssignment(assignmentId));
+  // };
 
   const formatDateTime = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -68,7 +65,7 @@ export default function Assignments(
               <div className="wd-assignments-title p-4 ps-2 bg-secondary">
 
                 {/* Only faculty can manage modules' sequences */}
-                {currentUser.role === "FACULTY" &&
+                {userClient.canManageCourse(currentUser) &&
                   (<BsGripVertical className="me-2 fs-3" />)}
 
                 <FaSortDown className="mb-3 me-2" />
@@ -76,7 +73,7 @@ export default function Assignments(
                 <strong className="mx-2 mb-2">ASSIGNMENTS</strong>
 
                 {/* Only faculty can see assignments percentage */}
-                {currentUser.role === "FACULTY" && (
+                {userClient.canManageCourse(currentUser) && (
                   <>
                     <IoEllipsisVertical className="float-end mt-2 mx-1 " />
                     <GoPlus className="float-end mt-2 mx-1" />
@@ -146,7 +143,7 @@ export default function Assignments(
                         </div>
                       </div>
 
-                      {currentUser.role === "FACULTY" &&
+                      {userClient.canManageCourse(currentUser) &&
                         (<AssignmentControlButtons
                           assignmentId={assignment._id} />)
                       }

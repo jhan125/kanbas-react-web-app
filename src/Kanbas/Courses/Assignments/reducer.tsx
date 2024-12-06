@@ -3,6 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   assignments: [],
 };
+
 const assignmentsSlice = createSlice({
   name: "assignments",
   initialState,
@@ -11,11 +12,7 @@ const assignmentsSlice = createSlice({
       state.assignments = action.payload;
     },
     addAssignment: (state, { payload: assignment }) => {
-      const newAssignment: any = {
-        _id: new Date().getTime().toString(),
-        ...assignment
-      };
-      state.assignments = [...state.assignments, newAssignment] as any;
+      state.assignments = [...state.assignments, assignment] as any;
     },
     deleteAssignment: (state, { payload: assignmentId }) => {
       state.assignments = state.assignments.filter(

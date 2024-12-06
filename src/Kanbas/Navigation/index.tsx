@@ -1,9 +1,8 @@
-import './styles.css'
+import "./styles.css";
 import { AiOutlineDashboard } from "react-icons/ai";
-import { IoCalendarOutline, IoSettingsOutline } from "react-icons/io5";
+import { IoCalendarOutline } from "react-icons/io5";
 import { LiaBookSolid, LiaCogSolid } from "react-icons/lia";
 import { FaInbox, FaRegCircleUser } from "react-icons/fa6";
-// import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 
 export default function KanbasNavigation() {
@@ -21,31 +20,37 @@ export default function KanbasNavigation() {
 
   return (
     // 4.1 Styling the Kanbas Navigation Sidebar
-    // Navigation sidebar stretches the whole height of the screen && does not scroll with the rest of the Dashboard 
+    // Navigation sidebar stretches the whole height of the screen && does not scroll with the rest of the Dashboard
     // disappears when the screen is narrow, but appears again when the the screen widens.
-    <div id="wd-kanbas-navigation" style={{ width: 120 }}
+    <div
+      id="wd-kanbas-navigation"
+      style={{ width: 120 }}
       className="list-group rounded-0 position-fixed
-          bottom-0 top-0 d-none d-md-block bg-black z-2">
-
+          bottom-0 top-0 d-none d-md-block bg-black z-2"
+    >
       <a
         id="wd-neu-link"
         target="_blank"
         href="https://www.northeastern.edu/"
-        className="list-group-item bg-black border-0 text-center">
+        className="list-group-item bg-black border-0 text-center" rel="noreferrer"
+      >
         <img src="/images/NEU.jpg" width="75px" alt="NEU logo" />
       </a>
 
-      <Link key="/Kanbas/Account"
+      <Link
+        key="/Kanbas/Account"
         to="/Kanbas/Account"
         className={`list-group-item text-center border-0 bg-black
-        ${pathname.includes("Account")
+        ${
+          pathname.includes("Account")
             ? "bg-white text-danger"
-            : "bg-black text-white"}`}>
+            : "bg-black text-white"
+        }`}
+      >
         <FaRegCircleUser
           className={`fs-1 
-          ${pathname.includes("Account")
-              ? "text-danger"
-              : "text-white"}`} />
+          ${pathname.includes("Account") ? "text-danger" : "text-white"}`}
+        />
         <br />
         Account
       </Link>
@@ -55,9 +60,12 @@ export default function KanbasNavigation() {
           key={link.path}
           to={link.path}
           className={`list-group-item bg-black text-center border-0
-          ${pathname.includes(link.label)
+          ${
+            pathname.includes(link.label)
               ? "text-danger bg-white"
-              : "text-white bg-black"}`}>
+              : "text-white bg-black"
+          }`}
+        >
           {link.icon({ className: "fs-1 text-danger" })}
           <br />
           {link.label}

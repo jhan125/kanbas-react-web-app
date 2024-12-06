@@ -7,10 +7,11 @@ import { FaChartSimple } from "react-icons/fa6";
 import { TfiAnnouncement } from "react-icons/tfi";
 import { GoBellFill } from "react-icons/go";
 import { useSelector } from "react-redux";
+import * as userClient from "../../Account/client";
 
 export default function CourseStatus() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
-  const isFaculty = currentUser.role === "FACULTY";
+  const facultyOrAdmin = userClient.isAdmin(currentUser) || userClient.isFaculty(currentUser);
 
   return (
     <div
@@ -21,7 +22,7 @@ export default function CourseStatus() {
 
       <div className="d-flex">
         <div className="w-50 pe-1">
-          {isFaculty && (
+          {facultyOrAdmin && (
             <button className="btn btn-lg btn-secondary w-100 text-nowrap ">
               <MdDoNotDisturbAlt className="me-2 fs-5" />
               Unpublish </button>
@@ -29,7 +30,7 @@ export default function CourseStatus() {
         </div>
 
         <div className="w-50">
-          {isFaculty && (
+          {facultyOrAdmin && (
             <button className="btn btn-lg btn-success w-100">
               <FaCheckCircle className="me-2 fs-5" />
               Publish </button>
@@ -39,21 +40,21 @@ export default function CourseStatus() {
       </div>
       <br />
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <BiImport className="me-2 fs-5" />
           Import Existing Content
         </button>
       )}
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <LiaFileImportSolid className="me-2 fs-5" />
           Import from Commons
         </button>
       )}
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <IoMdHome className="me-2 fs-5" />
           Choose Home Page
@@ -67,21 +68,21 @@ export default function CourseStatus() {
       </button>
 
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <TfiAnnouncement className="me-2 fs-5" />
           New Announcement
         </button>
       )}
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <FaChartSimple className="me-2 fs-5" />
           New Analytics
         </button>
       )}
 
-      {isFaculty && (
+      {facultyOrAdmin && (
         <button className="btn btn-lg btn-secondary w-100 mt-1 text-start">
           <GoBellFill className="me-2 fs-5" />
           View Course Notifications
