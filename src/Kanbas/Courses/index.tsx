@@ -7,6 +7,12 @@ import { Navigate, Route, Routes, useParams, useLocation } from "react-router";
 import { FaAlignJustify } from "react-icons/fa";
 import { useState } from "react";
 import Users from "../Account/Users";
+import Quizzes from "./Quizzes";
+import QuizDetails from "./Quizzes/QuizDetails";
+import QuizEditor from "./Quizzes/QuizEditor";
+import QuizQuestionsEditor from "./Quizzes/QuizQuestionEditor/index";
+import Selector from "./Quizzes/QuizQuestionEditor/Selector";
+import Preview from "./Quizzes/QuizQuestionEditor/Preview";
 
 export default function Courses() {
   const { cid } = useParams();
@@ -36,13 +42,18 @@ export default function Courses() {
             <Route path="Modules" element={<Modules />} />
             <Route path="Piazza" element={<h2>Piazza</h2>} />
             <Route path="Zoom" element={<h2>Zoom</h2>} />
-            <Route path="Assignments" element={<Assignments/>} />
+            <Route path="Assignments" element={<Assignments />} />
             <Route
               path="Assignments/:aid"
-              element={<AssignmentEditor  />} />
+              element={<AssignmentEditor />} />
             <Route path="People" element={<Users />} />
-            <Route path="/Grades" element={<h2>Grades</h2>} />
-            <Route path="/Quizzes" element={<h2>Quizzes</h2>} />
+            <Route path="Grades" element={<h2>Grades</h2>} />
+            <Route path="Quizzes" element={<Quizzes courses={courses} />} />
+            <Route path="Quizzes/:qid" element={<QuizDetails />} />
+            <Route path="Quizzes/:qid/DetailEditor" element={<QuizEditor />} />
+            <Route path="Quizzes/:qid/QuestionEditor" element={<QuizQuestionsEditor />} />
+            <Route path="Quizzes/:qid/QuestionEditor/new" element={<Selector />} />
+            <Route path="Quizzes/:qid/Preview" element={<Preview />} />
           </Routes>
         </div>
       </div>
