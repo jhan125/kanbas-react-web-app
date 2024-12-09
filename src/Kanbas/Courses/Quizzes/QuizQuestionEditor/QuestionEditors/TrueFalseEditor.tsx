@@ -1,9 +1,9 @@
 import { Link, useLocation, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
-import * as client from "../client";
+import * as client from "../../client";
 import { useDispatch, useSelector } from "react-redux";
-import { updateQuizzes } from "../QuizReducer";
-import WysiwygEditor from "../WysiwygEditor";
+import { updateQuizzes } from "../../QuizReducer";
+import WysiwygEditor from "../../WysiwygEditor";
 
 type SelectorProps = {
   question: any;
@@ -18,7 +18,7 @@ export default function TrueFalseEditor({ question, setQuestion }: SelectorProps
     setQuestion({
       ...question,
       questionType: "True False",
-      answers: ["True", "False"], 
+      answers: ["True", "False"],
     });
   }, [setQuestion]);
 
@@ -36,7 +36,15 @@ export default function TrueFalseEditor({ question, setQuestion }: SelectorProps
 
     fetchQuiz();
   }, [qid]);
-  
+
+  // This function updates the question text
+  const handleQuestionChange = (content: string) => {
+    setQuestion({
+      ...question,
+      question: content
+    });
+  };
+
   const addQuestionToQuiz = () => {
     if (quiz) {
       const updatedQuiz = {
@@ -53,12 +61,13 @@ export default function TrueFalseEditor({ question, setQuestion }: SelectorProps
   return (
     <div className="ms-5">
       <label htmlFor="wd-question" className="mb-2" style={{ marginLeft: "350px" }}>Enter your question text, then select if True or False is the correct answer.</label>
-      <br/>
+      <br />
       <label htmlFor="wd-question" className="mb-2" style={{ marginLeft: "350px" }}><b>Question:</b></label>
       <br />
       <div style={{ width: "800px", height: "400px", marginLeft: "350px" }}>
         <WysiwygEditor
-          // onChange={() => {}} 
+          value={question.question}
+          onChange={handleQuestionChange}
         />
       </div>
       <br />
@@ -67,33 +76,33 @@ export default function TrueFalseEditor({ question, setQuestion }: SelectorProps
       <div className="col-sm-10" style={{ marginLeft: "350px" }}>
         <div className="form-check">
           <input className="form-check-input" type="radio"
-            name="gridRadios" id="t" 
-            checked={question.correctAnswer === "True"} onChange={() => setQuestion({ ...question, correctAnswer: "True" })}/>
+            name="gridRadios" id="t"
+            checked={question.correctAnswer === "True"} onChange={() => setQuestion({ ...question, correctAnswer: "True" })} />
           <label
             htmlFor="t" style={{ width: "250px", height: "50px", color: question.correctAnswer === "True" ? "green" : "black" }}>True</label></div>
         <div className="form-check">
           <input className="form-check-input" type="radio"
-            name="gridRadios" id="f" 
+            name="gridRadios" id="f"
             checked={question.correctAnswer === "False"} onChange={() => setQuestion({ ...question, correctAnswer: "False" })} />
           <label
             htmlFor="f" style={{ width: "250px", height: "50px", color: question.correctAnswer === "False" ? "green" : "black" }}>False</label></div>
-            
+
       </div>
       <hr />
       <div className="col" style={{ marginRight: "500px" }}>
         <div className="wd-flex-row-container float-end me-5">
           <button className="btn btn-lg btn-secondary me-1 float-end"
-              type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}>
-              <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} 
-                style={{ color: "black", textDecoration: "none" }}>
-                Cancel
-              </Link>
+            type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}>
+            <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+              style={{ color: "black", textDecoration: "none" }}>
+              Cancel
+            </Link>
           </button>
           <button onClick={addQuestionToQuiz} className="btn btn-lg btn-danger me-5 float-end">
-              <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} 
-                style={{ color: "white", textDecoration: "none" }}>
-                Update Question
-              </Link>
+            <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+              style={{ color: "white", textDecoration: "none" }}>
+              Update Question
+            </Link>
           </button>
         </div>
       </div>

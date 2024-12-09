@@ -11,22 +11,26 @@ export default function QuizEditor() {
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const location = useLocation();
-    const initialQuiz = location.state?.quiz;
+    const initialQuiz = location.state?.quiz || { title: 'New Quiz', points: 0, quizType: 'Graded Quiz' };
     const { quizzes } = useSelector((state: any) => state.QuizReducer);
     const [quiz, setQuiz] = useState(
-        quizzes.find((quiz: any) => quiz._id == qid) || initialQuiz
+        quizzes.find((quiz: any) => quiz._id === qid) || initialQuiz
     );
 
     const saveQuiz = async (publish: boolean) => {
         const updatedQuizData = { ...quiz, published: publish };
         if (qid === "new") {
             const createdQuiz = await client.createQuiz(cid as string, updatedQuizData);
+            console.log("Dispatch added Quiz...");
             dispatch(addQuizzes(createdQuiz));
+            console.log("Added Quiz...");
             if (publish) {
                 quiz.published = publish;
                 navigateToQuizList();
+                console.log("Navigate back to Quiz List...");
             } else {
-                navigateToQuizDetail(createdQuiz._id); 
+                navigateToQuizDetail(createdQuiz._id);
+                console.log("Navigate back to Quiz Details...");
             }
         } else {
             const updatedQuiz = await client.updateQuiz(updatedQuizData, qid as string);
@@ -43,7 +47,7 @@ export default function QuizEditor() {
         if (!dateInput) return '';
         const date = new Date(dateInput);
         return date.toISOString().split('T')[0];
-      }
+    }
 
     const navigateToQuizList = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/`);
@@ -53,22 +57,31 @@ export default function QuizEditor() {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${id}`);
     }
 
+    if (!quiz) {
+        return <div>Loading quiz data...</div>;
+    }
+
+
     return (
+
         <div className="container mt-4">
             <div>
-                <QuizEditorButtons/>
+                <QuizEditorButtons />
             </div>
             <br />
             <input className="form-control"
                 type="text"
                 id="quizTitle"
-                value={quiz.title} 
+                value={quiz.title}
                 onChange={(e) => setQuiz((a: any) => ({ ...a, title: e.target.value }))}
             />
             <form>
                 <div className="mb-3 pt-4">
                     <h5>Quiz Instructions:</h5>
-                    <WysiwygEditor/>
+                    <WysiwygEditor
+                        value={""}
+                        onChange={()=>{}}
+                    />
                 </div>
                 <div className="row mb-3">
                     <div className="col-md-10">
@@ -80,9 +93,9 @@ export default function QuizEditor() {
                                     onChange={(e) => setQuiz((a: any) => ({ ...a, quizType: e.target.value }))}
                                 >
                                     <option value="Graded Quiz">Graded Quiz</option>
-                                    <option value="Practice Quiz">Practice Quiz</option> 
+                                    <option value="Practice Quiz">Practice Quiz</option>
                                     <option value="Graded Survey">Graded Survey</option>
-                                    <option value="Ungraded Survey">Ungraded Survey</option> 
+                                    <option value="Ungraded Survey">Ungraded Survey</option>
                                 </select>
                             </div>
                         </div>
@@ -94,9 +107,9 @@ export default function QuizEditor() {
                                     onChange={(e) => setQuiz((a: any) => ({ ...a, assignmentGroup: e.target.value }))}
                                 >
                                     <option value="Quizzes">Quizzes</option>
-                                    <option value="Exams">Exams</option> 
+                                    <option value="Exams">Exams</option>
                                     <option value="Assignments">Assignments</option>
-                                    <option value="Project">Project</option> 
+                                    <option value="Project">Project</option>
                                 </select>
                             </div>
                         </div>
@@ -104,10 +117,10 @@ export default function QuizEditor() {
                             <label htmlFor="points" className="col-sm-4 col-form-label text-end">Points</label>
                             <div className="col-sm-8">
                                 <input className="form-control"
-                                type="number"
-                                id="points"
-                                value={quiz.points}
-                                onChange={(e) => setQuiz((a: any) => ({ ...a, points: e.target.value }))}
+                                    type="number"
+                                    id="points"
+                                    value={quiz.points}
+                                    onChange={(e) => setQuiz((a: any) => ({ ...a, points: e.target.value }))}
                                 />
                             </div>
                         </div>
@@ -115,9 +128,9 @@ export default function QuizEditor() {
                             <label htmlFor="entryOption" className="col-sm-4 col-form-label text-end"><strong>Options</strong></label>
                             <div className="col-sm-8">
                                 <div className="form-check mb-3">
-                                    <input className="form-check-input" type="checkbox" id="shuffle-answers" 
-                                        checked={quiz.shuffleAnswers} 
-                                        onChange={(e) => setQuiz((a: any) => ({ ...a, shuffleAnswers: e.target.checked }))}/>
+                                    <input className="form-check-input" type="checkbox" id="shuffle-answers"
+                                        checked={quiz.shuffleAnswers}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, shuffleAnswers: e.target.checked }))} />
                                     <label className="form-check-label" htmlFor="shuffle-answers">
                                         Shuffle Answers
                                     </label>
@@ -128,11 +141,11 @@ export default function QuizEditor() {
                                         Time Limit
                                     </label>
                                     <input className="form-control me-2"
-                                            type="number"
-                                            id="timeLimit"
-                                            style={{ width: '70px', height: '30px'}}
-                                            value={quiz.timeLimit}
-                                            onChange={(e) => setQuiz((a: any) => ({ ...a, timeLimit: parseInt(e.target.value) || 0 }))} />
+                                        type="number"
+                                        id="timeLimit"
+                                        style={{ width: '70px', height: '30px' }}
+                                        value={quiz.timeLimit}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, timeLimit: parseInt(e.target.value) || 0 }))} />
                                     Minutes
                                 </div>
                                 <div className="form-check mb-3 d-flex align-items-center">
@@ -141,19 +154,19 @@ export default function QuizEditor() {
                                         Multiple Attempts
                                     </label>
                                     <input className="form-control me-2"
-                                            type="number"
-                                            id="multipleattempts"
-                                            style={{ width: '70px', height: '30px'}}
-                                            value={quiz.multipleAttempts}
-                                            onChange={(e) => setQuiz((a: any) => ({ ...a, multipleAttempts: parseInt(e.target.value) || 0 }))}/>
+                                        type="number"
+                                        id="multipleattempts"
+                                        style={{ width: '70px', height: '30px' }}
+                                        value={quiz.multipleAttempts}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, multipleAttempts: parseInt(e.target.value) || 0 }))} />
                                     Times
                                 </div>
                                 <div className="form-check mb-3">
-                                    <input className="form-check-input" 
-                                        type="checkbox" 
-                                        id="show-correct-answers" 
-                                        checked={quiz.showCorrectAnswers} 
-                                        onChange={(e) => setQuiz((a: any) => ({ ...a, showCorrectAnswers : e.target.checked }))}/>
+                                    <input className="form-check-input"
+                                        type="checkbox"
+                                        id="show-correct-answers"
+                                        checked={quiz.showCorrectAnswers}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, showCorrectAnswers: e.target.checked }))} />
                                     <label className="form-check-label" htmlFor="show-correct-answers">
                                         Show Correct Answers
                                     </label>
@@ -164,33 +177,33 @@ export default function QuizEditor() {
                                         Access Code
                                     </label>
                                     <input className="form-control me-2"
-                                            type="string"
-                                            id="accesscode"
-                                            style={{ width: '100px', height: '30px'}}
-                                            value={quiz.accessCode}
-                                            onChange={(e) => setQuiz((a: any) => ({ ...a, accessCode: e.target.value.toString() }))}
+                                        type="string"
+                                        id="accesscode"
+                                        style={{ width: '100px', height: '30px' }}
+                                        value={quiz.accessCode}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, accessCode: e.target.value.toString() }))}
                                     />
                                 </div>
                                 <div className="form-check mb-3">
-                                    <input className="form-check-input" type="checkbox" id="show-correct-answers" 
-                                        checked={quiz.oneQuestionAtTime} 
-                                        onChange={(e) => setQuiz((a: any) => ({ ...a, oneQuestionAtTime: e.target.checked}))}/>
+                                    <input className="form-check-input" type="checkbox" id="show-correct-answers"
+                                        checked={quiz.oneQuestionAtTime}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, oneQuestionAtTime: e.target.checked }))} />
                                     <label className="form-check-label" htmlFor="show-correct-answers">
                                         One Question at a Time
                                     </label>
                                 </div>
                                 <div className="form-check mb-3">
-                                    <input className="form-check-input" type="checkbox" id="show-correct-answers" 
-                                        checked={quiz.webcamRequired} 
-                                        onChange={(e) => setQuiz((a: any) => ({ ...a, webcamRequired: e.target.checked}))}/>
+                                    <input className="form-check-input" type="checkbox" id="show-correct-answers"
+                                        checked={quiz.webcamRequired}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, webcamRequired: e.target.checked }))} />
                                     <label className="form-check-label" htmlFor="show-correct-answers">
                                         Webcam Required
                                     </label>
                                 </div>
                                 <div className="form-check mb-3">
-                                    <input className="form-check-input" type="checkbox" id="show-correct-answers" 
-                                        checked={quiz.lockQuestionsAfterAnswering} 
-                                        onChange={(e) => setQuiz((a: any) => ({ ...a, lockQuestionsAfterAnswering: e.target.checked}))}/>
+                                    <input className="form-check-input" type="checkbox" id="show-correct-answers"
+                                        checked={quiz.lockQuestionsAfterAnswering}
+                                        onChange={(e) => setQuiz((a: any) => ({ ...a, lockQuestionsAfterAnswering: e.target.checked }))} />
                                     <label className="form-check-label" htmlFor="show-correct-answers">
                                         Lock Questions After Answering
                                     </label>
@@ -243,10 +256,10 @@ export default function QuizEditor() {
                                 <button className="btn btn-secondary me-1" onClick={navigateToQuizList}>
                                     Cancel
                                 </button>
-                                <button className="btn btn-danger me-1" onClick={ () => { saveQuiz(false) }}>
+                                <button className="btn btn-danger me-1" onClick={() => { saveQuiz(false) }}>
                                     Save
                                 </button>
-                                <button className="btn btn-danger" onClick={ () => { saveQuiz(true) }}>
+                                <button className="btn btn-danger" onClick={() => { saveQuiz(true) }}>
                                     Save and Publish
                                 </button>
                             </div>
@@ -256,4 +269,8 @@ export default function QuizEditor() {
             </form>
         </div>
     );
+}
+
+function useEffect(arg0: () => void, arg1: any[]) {
+    throw new Error("Function not implemented.");
 }

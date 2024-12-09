@@ -4,10 +4,12 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { PiWarningCircle, PiPencil } from "react-icons/pi";
 import { useNavigate } from "react-router";
-import * as client from "../client";
-import QuizEditorButtons from "../QuizEditorButtons";
-import DisplayQuestion from "./DisplayQuestion";
-import { updateQuizzes } from "../QuizReducer";
+import * as client from "../../client";
+import QuizEditorButtons from "../../QuizEditorButtons";
+import DisplayQuestion from "../QuestionDisplay/DisplayQuestion";
+import { updateQuizzes } from "../../QuizReducer";
+import "../styles.css";
+import QuestionNavigation from './QuestionNavigation';
 
 export default function Preview() {
   const location = useLocation();
@@ -199,4 +201,169 @@ const StartTimeDisplay = () => {
       </div>
   );
 }
+
+// interface Question {
+//   _id: string;
+//   questionType: string;
+//   correctAnswer: string;
+//   points: number;
+//   answers: string[];
+// }
+
+// export default function Preview() {
+//   const location = useLocation();
+//   const { cid, qid } = useParams();
+//   const [quiz, setQuiz] = useState<any>({});
+//   const [questions, setQuestions] = useState<any[]>([]);
+//   const [userAnswers, setUserAnswers] = useState<any>({});
+//   const [score, setScore] = useState<number | null>(null);
+//   const navigate = useNavigate();
+//   const dispatch = useDispatch();
+
+//   /* Question Navigation */
+//   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+
+
+//   useEffect(() => {
+//     const fetchQuiz = async () => {
+//       try {
+//         const fetchedQuiz = await client.findQuizById(qid as string);
+//         setQuiz(fetchedQuiz);
+//         setQuestions(fetchedQuiz.questions || []);
+//       } catch (error) {
+//         console.error("Error fetching quiz:", error);
+//       }
+//     };
+
+//     fetchQuiz();
+//   }, [qid]);
+
+//   console.log(quiz);
+//   console.log(questions);
+
+//   const handleSubmit = () => {
+//     let calculatedScore = 0;
+
+//     questions.forEach((question) => {
+//       const userAnswer = userAnswers[question._id];
+//       if (userAnswer === question.correctAnswer) {
+//         calculatedScore += question.points;
+//       }
+//     });
+
+//     setScore(calculatedScore);
+//   };
+
+//   // Handling navigation between questions
+//   const goToQuestion = (index: number) => {
+//     setCurrentQuestionIndex(index);
+//   };
+
+//   const formatDate = (date: Date) => {
+//     const options: Intl.DateTimeFormatOptions = {
+//       month: 'short', // 'Jan', 'Feb', etc.
+//       day: 'numeric', // '1', '2', etc.
+//       hour: 'numeric',
+//       minute: '2-digit',
+//       hour12: true, // 12-hour time format
+//     };
+
+//     const formatter = new Intl.DateTimeFormat('en-US', options);
+//     const parts = formatter.formatToParts(date);
+
+//     const month = parts.find(part => part.type === 'month')?.value || '';
+//     const day = parts.find(part => part.type === 'day')?.value || '';
+//     const hour = parts.find(part => part.type === 'hour')?.value || '';
+//     const minute = parts.find(part => part.type === 'minute')?.value || '';
+//     const ampm = parts.find(part => part.type === 'dayPeriod')?.value || '';
+
+//     return `${month} ${day} at ${hour}:${minute}${ampm}`;
+//   };
+
+//   const DateTimeDisplay = () => {
+//     const [currentTime, setCurrentTime] = useState(new Date());
+
+//     useEffect(() => {
+//       const interval = setInterval(() => {
+//         setCurrentTime(new Date());
+//       }, 60000); // Update every second
+
+//       return () => clearInterval(interval); // Clean up the interval on unmount
+//     }, []);
+
+//     const formattedDate = formatDate(currentTime);
+
+//     return <div>{formattedDate}</div>;
+//   };
+
+//   const StartTimeDisplay = () => {
+//     const [startTime] = useState(new Date());
+
+//     const formattedDate = formatDate(startTime);
+
+//     return <div>{formattedDate}</div>;
+//   };
+
+//   return (
+//     <div className="container mt-4">
+
+//       <div><h3><strong>{quiz.title}</strong></h3></div>
+//       <div className="alert alert-danger" role="alert">
+//         <PiWarningCircle />
+//         This is a preview of the published version of the quiz
+//       </div>
+
+//       <div className="d-flex">
+//         Started:&nbsp;
+//         <StartTimeDisplay />
+//       </div>
+
+//       <h3><strong>Quiz Instructions</strong></h3>
+//       <hr />
+
+//       <div className="flex-questions-container">
+//         {questions.length > 0 && (
+//           <div className="list-group-item mb-3">
+//             <DisplayQuestion
+//               question={questions[currentQuestionIndex]} />
+//           </div>
+//         )}
+//       </div>
+
+//       <div className="d-flex justify-content-end align-items-center" style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "black", width: "100%", height: "55px" }}>
+//         <div className="d-flex me-3">Quiz saved at&nbsp;<DateTimeDisplay /></div>
+//         <button className="btn btn-md btn-secondary me-2"
+//           onClick={handleSubmit}>
+//           Submit Quiz
+//         </button>
+//       </div>
+
+//       {score !== null && (
+//         <div className="alert alert-success mt-2" role="alert">
+//           Your score: {score} / {quiz.points}
+//         </div>
+//       )}
+//       <br /><br /><br />
+
+//       <div className="p-2 mb-2" style={{ backgroundColor: "#f5f5f5", width: "100%" }}>
+//         <button style={{ background: "none", border: "none", color: "red", cursor: "pointer", padding: "0" }}>
+//           <Link to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+//             style={{ color: "black", textDecoration: "none" }}>
+//             <PiPencil style={{ transform: "scaleX(-1)" }} />
+//             Keep Editing This Quiz
+//           </Link>
+//         </button>
+//       </div>
+//       <br /><br />
+
+//       <h4>Questions</h4>
+//       <QuestionNavigation
+//         totalQuestions={questions.length}
+//         currentQuestion={currentQuestionIndex}
+//         setCurrentQuestion={goToQuestion}
+//       />
+
+//     </div >
+//   );
+// }
 

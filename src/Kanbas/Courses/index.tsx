@@ -12,7 +12,7 @@ import QuizDetails from "./Quizzes/QuizDetails";
 import QuizEditor from "./Quizzes/QuizEditor";
 import QuizQuestionsEditor from "./Quizzes/QuizQuestionEditor/index";
 import Selector from "./Quizzes/QuizQuestionEditor/Selector";
-import Preview from "./Quizzes/QuizQuestionEditor/Preview";
+import Preview from "./Quizzes/QuizQuestionEditor/QuizPreview/Preview";
 
 export default function Courses() {
   const { cid } = useParams();

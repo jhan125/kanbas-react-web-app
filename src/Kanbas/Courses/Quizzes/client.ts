@@ -10,8 +10,8 @@ export const findAllQuizzes = async() => {
 }
 
 export const findQuizzesByCourse = async (courseId: string) => {
+    console.log(`Fetching quizzes for course ID: ${courseId}`);
     const response = await axiosWithCredentials.get(`${COURSES_API}/${courseId}/quizzes`);
-    console.log(response);
     return response.data;
 };
 

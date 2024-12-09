@@ -11,17 +11,33 @@ export default function QuizDetails() {
     const quizzes = useSelector((state: any) => state.QuizReducer.quizzes);
     const isCreatingNew = qid === 'new';
 
-    const formatDateForInput = (dateInput: any) => {
-        if (!dateInput) return '';
-        const date = new Date(dateInput);
-        return date.toISOString().split('T')[0];
-    }
+    // const formatDateForInput = (dateInput: any) => {
+    //     if (!dateInput) return '';
+    //     const date = new Date(dateInput);
+    //     return date.toISOString().split('T')[0];
+    // }
+
+    const formatDateForInput = (dateStr: any) => {
+        const date = new Date(dateStr);
+        if (isNaN(date.getTime())) {
+            return ""; // Handle invalid date inputs
+        }
+    
+        const month = date.toLocaleString("en-US", { month: "short" });
+        const day = date.getDate();
+        let hours = date.getHours();
+        const minutes = date.getMinutes() === 0 ? '' : `:${date.getMinutes()}`;
+        const ampm = hours >= 12 ? "pm" : "am";
+        hours = hours % 12 || 12; // Convert 0 to 12 for midnight
+    
+        return `${month} ${day} at ${hours}${minutes}${ampm}`; // Outputs "Sep 21 at 1pm"
+    };
 
     const defaultQuizDetails = {
         title: isCreatingNew ? "New Quiz" : "Loading Quiz...",
         quizType: "Graded Quiz",
         assignmentGroup: "Quizzes", 
-        points: 35,
+        points: 100,
         shuffleAnswers: true, 
         timeLimit: 20, 
         multipleAttempts: 1,
@@ -56,6 +72,8 @@ export default function QuizDetails() {
     const navigateToQuizPreview = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/Preview`);
     };
+
+    
 
     return(
         <div id="wd-quizdetail" className="container mt-4">

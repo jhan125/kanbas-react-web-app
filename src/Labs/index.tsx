@@ -12,7 +12,7 @@ export default function Labs() {
   return (
     <Provider store={store}>
       <div className="p-3">
-        <h1>Welcome to Web Dev</h1>
+        <h1>Web Development Group Project</h1>
         <h2>Jiali Han</h2>
         <TOC />
         <Routes>

@@ -8,18 +8,18 @@ import { useNavigate, useParams, useLocation } from "react-router-dom";
 import * as client from "./client";
 
 export default function QuizMenuButtons(
-    {   
-        quizId, 
-        deleteQuiz, 
+    {
+        quizId,
+        deleteQuiz,
         editQuiz,
         published
-    } : 
-    {
-        quizId: string;
-        deleteQuiz: (quizId: string) => void;
-        editQuiz: (quizId: string) => void;
-        published: boolean;
-    }
+    }:
+        {
+            quizId: string;
+            deleteQuiz: (quizId: string) => void;
+            editQuiz: (quizId: string) => void;
+            published: boolean;
+        }
 ) {
     const { quizzes } = useSelector((state: any) => state.QuizReducer);
     const [quiz, setQuiz] = useState(
@@ -30,9 +30,9 @@ export default function QuizMenuButtons(
     const [isPublished, setIsPublished] = useState(published);
     const dispatch = useDispatch();
 
-    const handleTogglePublish = async() => {
-        const updatedQuizData = {...quiz, published: !isPublished};
-        const currentPublished = await client.updateQuiz(updatedQuizData,quizId as string)
+    const handleTogglePublish = async () => {
+        const updatedQuizData = { ...quiz, published: !isPublished };
+        const currentPublished = await client.updateQuiz(updatedQuizData, quizId as string)
         dispatch(updateQuizzes(currentPublished));
         setIsPublished(!isPublished);
     };

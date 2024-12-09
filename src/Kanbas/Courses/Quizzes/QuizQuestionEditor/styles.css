@@ -1,0 +1,25 @@
+/* QUESTION PREVIEW */
+.question-navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.question-link {
+  background: none;
+  border: none;
+  color: crimson;
+  cursor: pointer;
+  font-size: 18px;
+  transition: color 0.3s;
+  margin-left: 15px;
+}
+
+.question-link:hover, .question-link.active {
+  color: firebrick;
+  font-weight: bold;
+}
+
+.question-icon {
+  margin-right: 5px;
+}
