@@ -1,9 +1,9 @@
-import QuizEditorButtons from "./QuizEditorButtons";
+import QuizEditorButtons from "./QuizQuestionEditor/QuizEditorButtons";
 import { useState } from "react";
 import { useSelector, useDispatch } from 'react-redux';
 import { updateQuizzes, addQuizzes } from "./QuizReducer";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
-import WysiwygEditor from "./WysiwygEditor";
+import WysiwygEditor from "./QuizQuestionEditor/QuestionEditors/WysiwygEditor";
 import * as client from "./client";
 
 export default function QuizEditor() {
@@ -48,6 +48,21 @@ export default function QuizEditor() {
         const date = new Date(dateInput);
         return date.toISOString().split('T')[0];
     }
+    // const formatDateForInput = (dateStr: any) => {
+    //     const date = new Date(dateStr);
+    //     if (isNaN(date.getTime())) {
+    //         return ""; // Handle invalid date inputs
+    //     }
+    
+    //     const month = date.toLocaleString("en-US", { month: "short" });
+    //     const day = date.getDate();
+    //     let hours = date.getHours();
+    //     const minutes = date.getMinutes() === 0 ? '' : `:${date.getMinutes()}`;
+    //     const ampm = hours >= 12 ? "pm" : "am";
+    //     hours = hours % 12 || 12; // Convert 0 to 12 for midnight
+    
+    //     return `${month} ${day} at ${hours}${minutes}${ampm}`; // Outputs "Sep 21 at 1pm"
+    // };
 
     const navigateToQuizList = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/`);

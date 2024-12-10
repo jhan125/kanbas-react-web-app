@@ -35,3 +35,37 @@ export const updateQuiz = async (quiz: any, quizId: string) => {
     console.log(response)
     return response.data; 
 }
+export const getQuestions = async (quizId: string) => {
+    const { data } = await axiosWithCredentials.get(`${QUIZZES_API}/${quizId}/questions`);
+    return data;
+}
+
+export const newAttempt = async (quizId: string, userId: string) => {
+    const { data } = await axiosWithCredentials.post(`${QUIZZES_API}/${quizId}/user/${userId}/answers`);
+    return data;
+}
+
+export const submitQuiz = async (quizId: string, userId: string) => {
+    const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quizId}/user/${userId}/answers/finished`);
+    return data;
+}
+
+export const addAnswerToMap = async (quizId: string, userId: string, answer: any) => {
+    const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quizId}/user/${userId}/answer`, answer);
+    return data;
+}
+
+export const getAnswers = async (quizId: string, userId: string) => {
+    const { data } = await axiosWithCredentials.get(`${QUIZZES_API}/${quizId}/user/${userId}/answers`);
+    return data;
+}
+
+export const getAnswersForQuiz = async (quizId: string, userId: string) => {
+    const { data } = await axiosWithCredentials.get(`${QUIZZES_API}/${quizId}/user/${userId}/answers`);
+    return data;
+}
+
+export const updateAnswer = async (quizId: string, userId: string, updateAnswer: any) => {
+    const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quizId}/user/${userId}/answers/update`, updateAnswer);
+    return data;
+}

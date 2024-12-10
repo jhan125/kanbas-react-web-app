@@ -124,3 +124,10 @@ export const canManageCourse = (user: any) => {
   }
   return isFaculty(user) || isAdmin(user);
 };
+
+export const canManageQuiz = (user: any) => {
+  if (!user) {
+    return false;
+  }
+  return isFaculty(user) || isAdmin(user);
+};

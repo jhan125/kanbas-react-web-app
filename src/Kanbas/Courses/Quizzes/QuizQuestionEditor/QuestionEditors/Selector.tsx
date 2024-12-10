@@ -1,11 +1,7 @@
-import { BsCalendar2Range } from "react-icons/bs";
-import { Link, useLocation, useParams } from "react-router-dom";
 import React, { useState } from "react";
-import { Routes, Route, Navigate } from "react-router";
-import MultipleChoiceEditor from "./QuestionEditors/MultipleChoiceEditor";
-import TrueFalseEditor from "./QuestionEditors/TrueFalseEditor";
-import FillInBlanksEditor from "./QuestionEditors/FillInBlanksEditor";
-import { findQuizById } from "../client";
+import MultipleChoiceEditor from "./MultipleChoiceEditor";
+import TrueFalseEditor from "./TrueFalseEditor";
+import FillInBlanksEditor from "./FillInBlanksEditor";
 
 export default function Selector() {
     // const { cid, qid } = useParams();
@@ -27,11 +23,11 @@ export default function Selector() {
 
     return (
         <div>
-            <div id="wd-question-editor" className="ms-5 mt-5 wd-flex-row-container">
+            <div id="wd-question-editor" className="mt-5 wd-flex-row-container">
                 <input id="wd-question-title" className="form-control"
-                    onChange={(e) => setQuestion({ ...question, title: e.target.value })} style={{ width: "13%", height: "5%", marginLeft: "350px" }} />
+                    onChange={(e) => setQuestion({ ...question, title: e.target.value })} style={{ width: "13%", height: "5%", marginLeft: "20px" }} />
                 <div className="wd-flex-row-container">
-                    <select id="wd-group" className="wd-css-styling-dropdowns ms-5" style={{ height: "40px", width: "400px", borderColor: "#E8E9EB", borderWidth: "2px", borderRadius: "5px" }}
+                    <select id="wd-group" className="wd-css-styling-dropdowns ms-5" style={{ height: "40px", width: "350px", borderColor: "#E8E9EB", borderWidth: "2px", borderRadius: "5px" }}
                         onChange={(e) => { setEditor(e.target.value) }}>
                         <option value="MultipleChoiceEditor">Multiple Choice</option>
                         <option value="TrueFalseEditor">True/False</option>
@@ -45,6 +41,7 @@ export default function Selector() {
                 <br /><br />
             </div>
             <hr />
+            
             {currentEditor === "MultipleChoiceEditor" ? (
                 <MultipleChoiceEditor question={question} setQuestion={setQuestion} />
             ) : currentEditor === "TrueFalseEditor" ? (

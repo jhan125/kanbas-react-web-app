@@ -1,10 +1,9 @@
-import { BsCalendar2Range } from "react-icons/bs";
-import { Link, useLocation, useParams } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { Link, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
 import React, { useState, useEffect } from "react";
 import { BsPlus } from "react-icons/bs";
 import { PiTrashLight } from "react-icons/pi";
-import WysiwygEditor from "../../WysiwygEditor";
+import WysiwygEditor from "./WysiwygEditor";
 import * as client from "../../client";
 import { updateQuizzes } from "../../QuizReducer";
 
@@ -86,54 +85,67 @@ export default function FillInBlanksEditor({ question, setQuestion }: SelectorPr
     };
 
     return (
-        <div id="wd-assignments-editor" className="ms-5">
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px", width: "800px" }}>Enter your question text, then define all possible correct answers for the blank. Students will see the question followed by a small text box to type their answer.</label>
+        <div id="wd-question-editor">
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px", width: "800px" }}>
+                Enter your question text, then define all possible correct answers for the blank. Students will see the question followed by a small text box to type their answer.
+            </label>
             <br />
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Question:</b></label>
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px" }}>
+                <b>Question:</b>
+            </label>
             <br />
-            <div style={{ width: "800px", height: "400px", marginLeft: "350px" }}>
+            <div style={{ width: "800px", height: "400px", marginLeft: "20px" }}>
                 <WysiwygEditor
                     value={question.question}
                     onChange={handleQuestionChange}
                 />
             </div>
-            <br />
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Answers:</b></label>
+            
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px" }}>
+                <b>Answers:</b>
+            </label>
             <br />
 
-            <div className="col-sm-10" style={{ marginLeft: "350px" }}>
+            <div className="col-sm-10" style={{ marginLeft: "20px" }}>
                 {question.answers.map((answer: string, index: number) => (
-                    <div className="form-check d-flex align-items-center">
-                        <label
-                            htmlFor={index.toString()}
-                        > Acceptable Answer: </label>
+                    <div key={index} className="form-check d-flex align-items-center">
+                        <label htmlFor={index.toString()}>
+                            Acceptable Answer:
+                        </label>
                         <input
                             className="form-control mb-3 ms-3"
                             id={index.toString()}
                             style={{ width: "250px", height: "50px" }}
                             onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={question.answers[index] || ""}
+                            placeholder={answer || `Option ${index + 1}`}
                         />
-                        <PiTrashLight onClick={() => deleteAnswerOption(index)} className="fs-4 ms-auto" style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
+                        <PiTrashLight
+                            onClick={() => deleteAnswerOption(index)} 
+                            className="fs-3 ms-4" 
+                            style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
                     </div>
                 ))}
-                <button onClick={addAnswerOption} className="text-danger mt-2" style={{ background: "none", border: "none", color: "red", float: "right", cursor: "pointer", padding: "0", marginRight: "330px" }} >
-                    <BsPlus className="fs-5" /> Add another answer
+                <button
+                    onClick={addAnswerOption}
+                    className="text-danger mt-2"
+                    style={{ background: "none", border: "none", color: "red", float: "left", cursor: "pointer", padding: "0" }} >
+                    <BsPlus className="fs-5" />
+                    Add another answer
                 </button>
             </div><br /><br />
 
             <hr />
-            <div className="col" style={{ marginRight: "500px" }}>
-                <div className="wd-flex-row-container float-end me-5">
-                    <button id="wd-add-assignment-group" className="btn btn-lg btn-secondary me-1 float-end"
-                        type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}>
-                        <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+            <div className="col">
+                <div className="wd-flex-row-container float-none">
+                    <button className="btn btn-lg btn-secondary me-4 float-end"
+                        style={{ color: "black", backgroundColor: "#F5F5F5" }}>
+                        <Link to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
                             style={{ color: "black", textDecoration: "none" }}>
                             Cancel
                         </Link>
                     </button>
-                    <button onClick={addQuestionToQuiz} id="wd-add-assignment" className="btn btn-lg btn-danger me-5 float-end">
-                        <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+                    <button onClick={addQuestionToQuiz} className="btn btn-lg btn-danger me-5 float-end">
+                        <Link to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
                             style={{ color: "white", textDecoration: "none" }}>
                             Update Question
                         </Link>
@@ -142,6 +154,65 @@ export default function FillInBlanksEditor({ question, setQuestion }: SelectorPr
             </div>
         </div>
     );
+
+
+    // return (
+    //     <div id="wd-question-editor" className="ms-5">
+    //         <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px", width: "800px" }}>Enter your question text, then define all possible correct answers for the blank. Students will see the question followed by a small text box to type their answer.</label>
+    //         <br />
+    //         <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Question:</b></label>
+    //         <br />
+    //         <div style={{ width: "800px", height: "400px", marginLeft: "350px" }}>
+    //             <WysiwygEditor
+    //                 value={question.question}
+    //                 onChange={handleQuestionChange}
+    //             />
+    //         </div>
+    //         <br />
+    //         <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Answers:</b></label>
+    //         <br />
+
+    //         <div className="col-sm-10" style={{ marginLeft: "350px" }}>
+    //             {question.answers.map((answer: string, index: number) => (
+    //                 <div className="form-check d-flex align-items-center">
+    //                     <label
+    //                         htmlFor={index.toString()}
+    //                     > Acceptable Answer: </label>
+    //                     <input
+    //                         className="form-control mb-3 ms-3"
+    //                         id={index.toString()}
+    //                         style={{ width: "250px", height: "50px" }}
+    //                         onChange={(e) => handleAnswerChange(index, e.target.value)}
+    //                         placeholder={question.answers[index] || ""}
+    //                     />
+    //                     <PiTrashLight onClick={() => deleteAnswerOption(index)} className="fs-4 ms-auto" style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
+    //                 </div>
+    //             ))}
+    //             <button onClick={addAnswerOption} className="text-danger mt-2" style={{ background: "none", border: "none", color: "red", float: "right", cursor: "pointer", padding: "0", marginRight: "330px" }} >
+    //                 <BsPlus className="fs-5" /> Add another answer
+    //             </button>
+    //         </div><br /><br />
+
+    //         <hr />
+    //         <div className="col" style={{ marginRight: "500px" }}>
+    //             <div className="wd-flex-row-container float-end me-5">
+    //                 <button id="wd-add-assignment-group" className="btn btn-lg btn-secondary me-1 float-end"
+    //                     type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}>
+    //                     <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+    //                         style={{ color: "black", textDecoration: "none" }}>
+    //                         Cancel
+    //                     </Link>
+    //                 </button>
+    //                 <button onClick={addQuestionToQuiz} id="wd-add-assignment" className="btn btn-lg btn-danger me-5 float-end">
+    //                     <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
+    //                         style={{ color: "white", textDecoration: "none" }}>
+    //                         Update Question
+    //                     </Link>
+    //                 </button>
+    //             </div>
+    //         </div>
+    //     </div>
+    // );
 }
 
 export { };

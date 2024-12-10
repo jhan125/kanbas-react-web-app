@@ -1,9 +1,9 @@
-import { useDispatch, useSelector } from "react-redux";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import React, { useState, useEffect } from "react";
 import { BsPlus } from "react-icons/bs";
 import { PiTrashLight } from "react-icons/pi";
-import WysiwygEditor from "../../WysiwygEditor";
+import WysiwygEditor from "./WysiwygEditor";
 import * as client from "../../client";
 import { updateQuizzes } from "../../QuizReducer";
 
@@ -15,6 +15,7 @@ type SelectorProps = {
 export default function MultipleChoiceEditor({ question, setQuestion }: SelectorProps) {
     const { cid, qid } = useParams();
     const [quiz, setQuiz] = useState<any>();
+    const navigate = useNavigate();
 
     useEffect(() => {
         setQuestion({
@@ -40,7 +41,6 @@ export default function MultipleChoiceEditor({ question, setQuestion }: Selector
         console.log(quiz);
     }, [qid]);
 
-    // This function updates the question text
     const handleQuestionChange = (content: string) => {
         setQuestion({
             ...question,
@@ -72,7 +72,7 @@ export default function MultipleChoiceEditor({ question, setQuestion }: Selector
         });
     };
 
-    const addQuestionToQuiz = () => {
+    const addQuestionToQuiz = async () => {
         if (quiz) {
             const updatedQuiz = {
                 ...quiz,
@@ -81,26 +81,37 @@ export default function MultipleChoiceEditor({ question, setQuestion }: Selector
             };
             setQuiz(updatedQuiz);
             dispatch(updateQuizzes(updatedQuiz));
-            client.updateQuiz(updatedQuiz, qid as string);
+            // client.updateQuiz(updatedQuiz, qid as string);
+            await client.updateQuiz(updatedQuiz, qid as string);
+            navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`);
         }
     };
 
+    const cancelUpdate = () => {
+        navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`);
+    };
+
     return (
-        <div id="wd-assignments-editor" className="ms-5">
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}>Enter your question and multiple answers, then select the one correct answer.</label>
+        <div id="wd-question-editor">
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px", width: "800px" }}>
+                Enter your question and multiple answers, then select the one correct answer.
+            </label>
             <br />
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Question:</b></label>
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px" }}>
+                <b>Question:</b>
+            </label>
             <br />
-            <div style={{ width: "800px", height: "400px", marginLeft: "350px" }}>
+            <div style={{ width: "800px", height: "400px", marginLeft: "20px" }}>
                 <WysiwygEditor
                     value={question.question}
                     onChange={handleQuestionChange}
                 />
             </div>
+
+            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px" }}><b>Answers:</b></label>
             <br />
-            <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "350px" }}><b>Answers:</b></label>
-            <br />
-            <div className="col-sm-10" style={{ marginLeft: "350px" }}>
+
+            <div className="col-sm-10" style={{ marginLeft: "20px" }}>
                 {question.answers.map((answer: string, index: number) => (
                     <div key={index} className="form-check d-flex align-items-center">
                         <input
@@ -117,30 +128,32 @@ export default function MultipleChoiceEditor({ question, setQuestion }: Selector
                             placeholder={answer || `option ${index + 1}`}
                             value={answer || ""}
                         />
-                        <PiTrashLight onClick={() => deleteAnswerOption(index)} className="fs-4 ms-auto" style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
+                        <PiTrashLight
+                            onClick={() => deleteAnswerOption(index)}
+                            className="fs-4 ms-4"
+                            style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
                     </div>
                 ))}
-                <button onClick={addAnswerOption} className="text-danger mt-2" style={{ background: "none", border: "none", color: "red", float: "right", cursor: "pointer", padding: "0", marginRight: "330px" }} >
-                    <BsPlus className="fs-5" /> Add another answer
+                <button
+                    onClick={addAnswerOption}
+                    className="text-danger mt-2"
+                    style={{ background: "none", border: "none", color: "red", float: "left", cursor: "pointer", padding: "0" }} >
+                    <BsPlus className="fs-5" />
+                    Add another answer
                 </button>
             </div><br /><br />
 
 
             <hr />
-            <div className="col" style={{ marginRight: "500px" }}>
-                <div className="wd-flex-row-container float-end me-5">
-                    <button id="wd-add-assignment-group" className="btn btn-lg btn-secondary me-1 float-end"
-                        type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}>
-                        <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
-                            style={{ color: "black", textDecoration: "none" }}>
-                            Cancel
-                        </Link>
+            <div className="col">
+                <div className="wd-flex-row-container float-none">
+                    <button id="wd-add-quiz-group" className="btn btn-lg btn-secondary me-4 float-end"
+                        type="button" style={{ color: "black", backgroundColor: "#F5F5F5" }}
+                        onClick={cancelUpdate}>
+                        Cancel
                     </button>
-                    <button onClick={addQuestionToQuiz} id="wd-add-assignment" className="btn btn-lg btn-danger me-5 float-end">
-                        <Link key={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`} to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
-                            style={{ color: "white", textDecoration: "none" }}>
-                            Update Question
-                        </Link>
+                    <button onClick={addQuestionToQuiz} id="wd-add-quiz" className="btn btn-lg btn-danger me-5 float-end">
+                        Update Question
                     </button>
                 </div>
             </div>

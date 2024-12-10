@@ -203,6 +203,35 @@ export default function Dashboard() {
           <hr />
         </div>
       )}
+
+      {userClient.isFaculty(currentUser) && (
+        <div>
+          {showUnEnrolledCourses === true ? (
+            <button
+              className="btn btn-success float-end"
+              id="wd-finish-add-new-course-click"
+              onClick={() => setShowAllCourses(false)}
+            >
+              Finish
+            </button>
+          ) : (
+            <button
+              className="btn btn-primary float-end"
+              id="wd-add-new-course-click"
+              onClick={() => setShowAllCourses(true)}
+            >
+              Enroll in New Courses
+            </button>
+          )}
+          <br />
+          <br />
+          <hr />
+        </div>
+      )}
+
+
+
+
       {userClient.isStudent(currentUser) && (
         <div>
           {showUnEnrolledCourses === true ? (
@@ -227,6 +256,7 @@ export default function Dashboard() {
           <hr />
         </div>
       )}
+
       {showUnEnrolledCourses === false ? (
         <>
           <h2 id="wd-dashboard-published">
@@ -242,6 +272,7 @@ export default function Dashboard() {
           <hr />
         </>
       )}
+
       <div id="wd-dashboard-enrolledCourses" className="row">
         <div className="row row-cols-1 row-cols-md-5 g-4">
           {!showUnEnrolledCourses &&
@@ -368,6 +399,7 @@ export default function Dashboard() {
             ))}
         </div>
       </div>
+
       {/* Delete Confirmation Modal */}
       <DeleteConfirmationModal
         show={showDeleteModal}

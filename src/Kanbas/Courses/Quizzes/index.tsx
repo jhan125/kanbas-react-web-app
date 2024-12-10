@@ -8,11 +8,14 @@ import QuizMenuButtons from "./QuizMenuButtons";
 import { FaSortDown } from "react-icons/fa";
 import { LuPlane } from "react-icons/lu";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
+import * as userClient from "../../Account/client";
 
 export default function Quizzes(
    { courses }:
       { courses: any[]; }) {
 
+   const { currentUser } = useSelector((state: any) => state.accountReducer);
+   console.log("[Quiz] Current user:", currentUser._id);
    const { cid } = useParams();
    const navigate = useNavigate();
    const dispatch = useDispatch();
@@ -95,9 +98,15 @@ export default function Quizzes(
 
    return (
       <div id="wd-quizzes" className="container mt-4">
-         <QuizControls addQuiz={() => {
-            navigate(`/Kanbas/Courses/${cid}/Quizzes/new`);
-         }} /><br /><br />
+
+         {userClient.canManageQuiz(currentUser) && (
+            <div>
+               <QuizControls addQuiz={() => {
+                  navigate(`/Kanbas/Courses/${cid}/Quizzes/new`);
+               }} />
+            </div>
+         )}
+
          <ul id="wd-quizzes" className="list-group rounded-0">
             <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
                <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center">
@@ -117,7 +126,9 @@ export default function Quizzes(
                            <div>
                            </div>
 
-                           <div style={{ marginLeft: '10px' }} className="ms-3" onClick={() => navigateToQuizDetail(quiz._id, quiz.title)}>
+                           <div
+                              style={{ marginLeft: '10px' }} className="ms-3"
+                              onClick={() => navigateToQuizDetail(quiz._id, quiz.title)}>
                               <strong>{quiz.title}</strong>
                               <br />
 
@@ -139,15 +150,16 @@ export default function Quizzes(
                               </span>
                            </div>
 
-
-                           <div className="me-2 " style={{ marginLeft: 'auto' }}>
-                              <QuizMenuButtons
-                                 quizId={quiz._id}
-                                 deleteQuiz={() => openDeleteModal(quiz._id)}
-                                 editQuiz={() => navigateToQuizDetail(quiz._id, quiz.title)}
-                                 published={quiz.published}
-                              />
-                           </div>
+                           {userClient.canManageQuiz(currentUser) && (
+                              <div className="me-2 " style={{ marginLeft: 'auto' }}>
+                                 <QuizMenuButtons
+                                    quizId={quiz._id}
+                                    deleteQuiz={() => openDeleteModal(quiz._id)}
+                                    editQuiz={() => navigateToQuizDetail(quiz._id, quiz.title)}
+                                    published={quiz.published}
+                                 />
+                              </div>
+                           )}
                         </li>
                      ))}
                </ul>

@@ -32,6 +32,17 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   border-left: 3px solid green !important;
 }
 
+.no-underline {
+  text-decoration: none;
+}
+
+.wd-course-image {
+  object-fit: cover; 
+  object-position: center;
+  height: 150px;
+}
+
+
 .border-gray {
   border: 1px solid gray;
 }
@@ -55,6 +66,7 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
 .table-details td:first-child {
   text-align: right;
 }
+
 .simple-table {
   width: 100%;
   border-collapse: collapse;
