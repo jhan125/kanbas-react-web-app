@@ -13,7 +13,7 @@ import QuizEditor from "./Quizzes/QuizEditor";
 import QuizQuestionsEditor from "./Quizzes/QuizQuestionEditor/index";
 import Selector from "./Quizzes/QuizQuestionEditor/QuestionEditors/Selector";
 import Preview from "./Quizzes/QuizQuestionEditor/QuizPreview/Preview";
-import StudentPreview from "./Quizzes/StudentQuiz/StudentPreview";
+import QuizOneAtATime from "./Quizzes/StudentQuiz/QuizOneAtATime";
 import GradedQuiz from "./Quizzes/StudentQuiz/GradedQuiz";
 
 export default function Courses() {
@@ -56,7 +56,7 @@ export default function Courses() {
             <Route path="Quizzes/:qid/QuestionEditor" element={<QuizQuestionsEditor />} />
             <Route path="Quizzes/:qid/QuestionEditor/new" element={<Selector />} />
             <Route path="Quizzes/:qid/Preview" element={<Preview />} />
-            <Route path="Quizzes/:qid/view" element={<StudentPreview />} />
+            <Route path="Quizzes/:qid/view" element={<QuizOneAtATime />} />
             <Route path="Quizzes/:qid/Graded" element={<GradedQuiz />} />
           </Routes>
         </div>

@@ -47,22 +47,6 @@ export default function QuizDetails() {
             // Quiz is not available or has closed, do nothing
             console.log("Quiz is not available or has closed");
         }
-
-        // let result = null;
-        // if (qid && currentUser._id) {
-        //     console.log("qid + userid: ", qid, currentUser._id);
-        //     result = await quizClient.newAttempt(qid, currentUser._id);
-        // } else {
-        //     return;
-        // }
-        // if (result) {
-        //     setMaxAttempts(false);
-        //     navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/view`);
-        // } else {
-        //     setMaxAttempts(true);
-        //     return;
-        // }
-        // console.log("Max Attempts true or false: ", maxAttempts);
     }
 
     const checkAvailableDate = () => {
@@ -159,7 +143,7 @@ export default function QuizDetails() {
     const navigateToQuizPreview = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/Preview`);
     };
-    const navigateToStudentPreview = () => {
+    const navigateToStudentView = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/view`);
     };
 
@@ -170,7 +154,7 @@ export default function QuizDetails() {
             {userClient.canManageQuiz(currentUser) && (
                 <div id="wd-quizdetail" className="container mt-4">
                     <div className="ms-auto" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                        <button id="wd-preview-btn" className="btn btn-me btn-secondary me-3" onClick={navigateToStudentPreview}>
+                        <button id="wd-preview-btn" className="btn btn-me btn-secondary me-3" onClick={navigateToStudentView}>
                             Preview
                         </button>
                         <button id="wd-add-group-btn" className="btn btn-me btn-secondary me-1" onClick={navigateToQuizEditor}>
@@ -310,8 +294,8 @@ export default function QuizDetails() {
                                 border: '1px solid #ccc'
                             }}>
                                 {quizDetails.multipleAttempts === 0
-                                    ? `${Math.max((answers?.attempt || 0) - 1, 0)}/Unlimited Attempts`
-                                    : `${Math.max((answers?.attempt || 0) - 1, 0)}/${quizDetails.multipleAttempts} attempts`}
+                                    ? `${(answers?.attempt || 0)}/Unlimited Attempts`
+                                    : `${(answers?.attempt || 0)}/${quizDetails.multipleAttempts} attempts`}
 
                             </span>
                         </p>

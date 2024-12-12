@@ -6,8 +6,9 @@ import { PiWarningCircle, PiPencil } from "react-icons/pi";
 import { useNavigate } from "react-router";
 import * as quizClient from "../client";
 import * as userClient from "../../../Account/client";
+import "./QuizView.css";
 
-export default function StudentPreview() {
+export default function QuizOneAtATime() {
   const location = useLocation();
   const { cid, qid } = useParams();
   const [quiz, setQuiz] = useState<any>({});
@@ -17,6 +18,9 @@ export default function StudentPreview() {
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
+  const currentQuestion = questions[currentQuestionIndex];
 
   useEffect(() => {
     const fetchQuiz = async () => {
@@ -57,7 +61,6 @@ export default function StudentPreview() {
       [questionId]: value,
     }));
   };
-
   const handleSubmit = async () => {
     if (!qid || !currentUser._id) return; // Guard clause
 
@@ -140,6 +143,90 @@ export default function StudentPreview() {
   };
 
 
+  const renderQuestion = (question: any, index: number, answers: any) => {
+    if (!question) {
+      return <p className="unknown-type">Question data is missing</p>;
+    }
+
+    return (
+      <div key={question._id} className="question-card">
+        <div className="question-header">
+          <div className="question-title">Question {index + 1}</div>
+          <div className="question-points">{question.points || 0} pts</div>
+        </div>
+        <p className="question-text">
+          {question.question || "No question text available"}
+        </p>
+        {(() => {
+          switch (question.questionType) {
+            case "Multiple Choice":
+              return (
+                <ul className="options-list">
+                  {question.answers
+                    .map((answer: string, index: number) => (
+                      <li
+                        key={`${question._id}-choice-${index}`}
+                        className="option-item"
+                      >
+                        <input
+                          onChange={() => handleAnswerChange(question._id, answer)}
+                          type="radio"
+                          name={question._id}
+                          id={`option-${index}`}
+                          value={answer}
+                          className="radio-input"
+                        />
+                        <label htmlFor={`option-${index}`}>{answer}</label>
+                      </li>
+                    ))}
+                </ul>
+              );
+            case "True False":
+              return (
+                <ul className="options-list">
+                  <li className="option-item">
+                    <input
+                      onChange={(e) => handleInputChange(e, question._id)} // Explicitly pass questionId
+                      type="radio"
+                      name={question._id}
+                      value="True"
+                      className="radio-input"
+                    />
+                    True
+                  </li>
+                  <li className="option-item">
+                    <input
+                      onChange={(e) => handleInputChange(e, question._id)} // Explicitly pass questionId
+                      type="radio"
+                      name={question._id}
+                      value="False"
+                      className="radio-input"
+                    />
+                    False
+                  </li>
+                </ul>
+              );
+            case "Fill In the Blank":
+              return (
+                <div>
+                  <input
+                    onChange={(e) => handleInputChange(e, question._id)} // Explicitly pass questionId
+                    type="text"
+                    name={question._id}
+                    placeholder="Type your answer here"
+                    className="fill-blank-input"
+                  />
+                </div>
+              );
+            default:
+              return <p className="unknown-type">Unknown question type</p>;
+          }
+        })()}
+      </div>
+    );
+  };
+
+
   return (
     <div className="container mt-4">
 
@@ -147,7 +234,7 @@ export default function StudentPreview() {
 
       {userClient.isFaculty(currentUser) && (
         <div className="alert alert-danger" role="alert"><PiWarningCircle />
-          This is a preview of the published version of the quiz.
+          This is a preview of the published version of the quiz
         </div>
       )}
 
@@ -161,78 +248,56 @@ export default function StudentPreview() {
       <hr />
 
       <div className="flex-questions-container mt-4">
-        <ul className="list-group" style={{ margin: "0px" }}>
-          {questions.length > 0 ? (
-            questions.map((question, index) => (
-              <li className="list-group-item" key={index}>
-                <div className="p-2 mb-2" style={{ backgroundColor: "#f5f5f5", width: "100%" }}>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <h5 className="m-0">Question {index + 1}</h5>
-                    <div className="d-flex align-items-center">
-                      <h5 className="m-0 me-3">{question.points} points</h5>
-                    </div>
-                  </div>
-                </div>
+        {quiz.oneQuestionAtTime ? (
+          <div>
+            {currentQuestion
+              ? (
+                renderQuestion(currentQuestion, currentQuestionIndex, currentQuestion.answers)
+              )
+              : (
+                <p className="unknown-type">No question available</p>
+              )}
+            <div className="action-buttons">
+              <button
+                className="action-button"
+                disabled={currentQuestionIndex === 0}
+                onClick={() => setCurrentQuestionIndex((prev) => prev - 1)}
+              >
+                Previous
+              </button>
+              {currentQuestionIndex < questions.length - 1 ? (
+                <button
+                  className="action-button"
+                  onClick={() => setCurrentQuestionIndex((prev) => prev + 1)}
+                >
+                  Next
+                </button>
+              ) : (
                 <div>
-
-                  <div>
-                    {/* <div className=""><h5>{question.title}</h5></div> */}
-                    <div><h6>{question.question}</h6></div>
-
-                    {question.questionType === "Fill In the Blank" ? (
-                      <input
-                        className="form-control"
-                        type="text"
-                        placeholder="Enter your answer here"
-                        onChange={(e) => handleInputChange(e, question._id)} // Explicitly pass questionId
-                      />
-                    ) : (
-                      <ul className="list-group" style={{ marginBottom: "10px" }}>
-                        {question.answers.length > 0 ? (question.answers.map((answer: string, index: number) => (
-
-                          <li className="list-group-item" style={{ borderColor: "white" }}>
-                            <input
-                              type="radio"
-                              name={"choice" + question._id}
-                              id={question._id + index}
-                              style={{ marginRight: "10px" }}
-                              onChange={() => handleAnswerChange(question._id, answer)}
-                            />
-
-                            <label htmlFor={question._id + index}> {answer} </label>
-                          </li>
-                        ))) : ""}
-                      </ul>
-                    )}
-
-
-                  </div>
+                  <button onClick={handleSubmit}
+                    className="action-button">
+                    Submit Quiz
+                  </button>
 
                 </div>
-              </li>
-            ))
-          ) : ""}
-        </ul>
+              )}
+            </div>
+          </div>
+        ) : (
+          <div>
+            {questions.map((question, index) => renderQuestion(question, index, currentQuestion.answers))}
+            <div> 
+              <button className="action-button float-end"
+                onClick={handleSubmit}>
+                Submit Quiz
+              </button>
+            </div>
+
+          </div>
+        )}
       </div>
 
-      <div className="d-flex justify-content-end align-items-center"
-        style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "black", width: "100%", height: "55px" }}>
-        <div className="d-flex me-3">
-          Quiz saved at&nbsp;
-          <DateTimeDisplay />
-        </div>
 
-        <button className="btn btn-md btn-secondary me-2"
-          onClick={handleSubmit}>
-          Submit Quiz
-        </button>
-      </div>
-
-      {score !== null && (
-        <div className="alert alert-success mt-2" role="alert">
-          Your score: {score} / {quiz.points}
-        </div>
-      )}
       <br /><br /><br />
     </div>
   );

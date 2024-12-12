@@ -54,7 +54,7 @@ export const submitQuiz = async (quizId: string, userId: string) => {
     return data;
 }
 
- // tested: update a already existed answer
+// tested: update a already existed answer
 export const addAnswerToMap = async (quizId: string, userId: string, answer: any) => {
     const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quizId}/user/${userId}/answer`, answer);
     return data;

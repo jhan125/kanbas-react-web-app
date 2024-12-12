@@ -88,13 +88,12 @@
 .action-button {
   padding: 10px 15px;
   font-size: 1rem;
-  color: #ffffff;
+  color: black;
   background-color: #bababa;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   text-align: center;
-  font-weight: bold;
 }
 
 .action-button:hover {
@@ -104,11 +103,6 @@
 .action-button:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-.submit-quiz {
-  margin-top: 20px;
-  text-align: right;
 }
 
 .unknown-type {
