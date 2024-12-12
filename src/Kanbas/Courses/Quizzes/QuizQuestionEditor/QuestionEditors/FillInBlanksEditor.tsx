@@ -100,7 +100,7 @@ export default function FillInBlanksEditor({ question, setQuestion }: SelectorPr
                     onChange={handleQuestionChange}
                 />
             </div>
-            
+
             <label htmlFor="wd-name" className="mb-2" style={{ marginLeft: "20px" }}>
                 <b>Answers:</b>
             </label>
@@ -109,19 +109,51 @@ export default function FillInBlanksEditor({ question, setQuestion }: SelectorPr
             <div className="col-sm-10" style={{ marginLeft: "20px" }}>
                 {question.answers.map((answer: string, index: number) => (
                     <div key={index} className="form-check d-flex align-items-center">
-                        <label htmlFor={index.toString()}>
+                        {/* Acceptable Answer Checkbox */}
+                        <input
+                            type="checkbox"
+                            id={`acceptable-${index}`}
+                            className="form-check-input"
+                            checked={!!answer} // Ensure valid answers remain checked
+                            onChange={(e) => {
+                                const updatedAnswers = [...question.answers];
+                                if (e.target.checked) {
+                                    updatedAnswers[index] = answer || `Option ${index + 1}`;
+                                } else {
+                                    updatedAnswers[index] = null;
+                                }
+
+                                const filteredAnswers = updatedAnswers.filter(ans => ans !== null);
+                                setQuestion({
+                                    ...question,
+                                    answers: filteredAnswers,
+                                    correctAnswer: filteredAnswers[0] || null, // Automatically set the first acceptable answer
+                                });
+                            }}
+                        />
+                        <label htmlFor={`acceptable-${index}`} className="ms-2">
                             Acceptable Answer:
                         </label>
+
+                        {/* Editable Answer Input */}
                         <input
                             className="form-control mb-3 ms-3"
-                            id={index.toString()}
+                            id={`answer-${index}`}
                             style={{ width: "250px", height: "50px" }}
-                            onChange={(e) => handleAnswerChange(index, e.target.value)}
-                            placeholder={answer || `Option ${index + 1}`}
+                            value={answer || ""}
+                            onChange={(e) => {
+                                const updatedAnswers = [...question.answers];
+                                updatedAnswers[index] = e.target.value;
+                                setQuestion({ ...question, answers: updatedAnswers });
+                            }}
+                            placeholder={`Option ${index + 1}`}
                         />
+
+                        {/* Delete Answer Option */}
+
                         <PiTrashLight
-                            onClick={() => deleteAnswerOption(index)} 
-                            className="fs-3 ms-4" 
+                            onClick={() => deleteAnswerOption(index)}
+                            className="fs-3 ms-4"
                             style={{ cursor: "pointer", color: "grey", marginRight: "330px", float: "right" }} />
                     </div>
                 ))}

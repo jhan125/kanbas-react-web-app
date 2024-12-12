@@ -149,4 +149,23 @@ body * {  font-family: Arial, Helvetica, sans-serif;  }
   padding-top: 10px;
 }
 
+.action-button {
+  padding: 10px 15px;
+  font-size: 1rem;
+  color: #ffffff;
+  background-color: #bababa;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  text-align: center;
+  font-weight: bold;
+}
 
+.action-button:hover {
+  background-color: #bababa;
+}
+
+.action-button:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+}

@@ -5,6 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import "../../styles.css";
 import { findQuizById } from "./client";
 import * as userClient from "../../Account/client";
+import * as quizClient from "./client";
 
 export default function QuizDetails() {
     const { currentUser } = useSelector((state: any) => state.accountReducer);
@@ -13,6 +14,73 @@ export default function QuizDetails() {
     const navigate = useNavigate();
     const quizzes = useSelector((state: any) => state.QuizReducer.quizzes);
     const isCreatingNew = qid === 'new';
+
+    /* -----HANDLE Student Side -------*/
+    const [answers, setAnswers] = useState<any>(null);
+    const [maxAttempts, setMaxAttempts] = useState<boolean>(false);
+
+    const handleNewAttempt = async () => {
+        // Check if the quiz is available before proceeding
+        const currentDate = new Date();
+        const availableDate = new Date(quizDetails.available);
+        const untilDate = new Date(quizDetails.until);
+
+         // ONLY if Quiz is available, proceed with the attempt
+        if (availableDate <= currentDate && untilDate >= currentDate) {
+           
+            let result = null;
+            if (qid && currentUser._id) {
+                console.log("qid + userid: ", qid, currentUser._id);
+                result = await quizClient.newAttempt(qid, currentUser._id);
+            } else {
+                return;
+            }
+    
+            if (result) {
+                setMaxAttempts(false);
+                navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/view`);
+            } else {
+                setMaxAttempts(true);
+                return;
+            }
+        } else {
+            // Quiz is not available or has closed, do nothing
+            console.log("Quiz is not available or has closed");
+        }
+
+        // let result = null;
+        // if (qid && currentUser._id) {
+        //     console.log("qid + userid: ", qid, currentUser._id);
+        //     result = await quizClient.newAttempt(qid, currentUser._id);
+        // } else {
+        //     return;
+        // }
+        // if (result) {
+        //     setMaxAttempts(false);
+        //     navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/view`);
+        // } else {
+        //     setMaxAttempts(true);
+        //     return;
+        // }
+        // console.log("Max Attempts true or false: ", maxAttempts);
+    }
+
+    const checkAvailableDate = () => {
+        const currentDate = new Date();
+        const availableDate = new Date(quizDetails.available);
+        const untilDate = new Date(quizDetails.until);
+        if (availableDate > currentDate) {
+            return `Not available until ${availableDate.toDateString().split(' ').slice(1).join(' ')}`;
+        }
+        else if (untilDate < currentDate) {
+            return `Closed`;
+        }
+        else {
+            return "Begin Quiz";
+        }
+    };
+
+    /* -----HANDLE Student Side -------*/
 
     const formatDateForInput = (dateInput: any) => {
         if (!dateInput) return '';
@@ -72,14 +140,29 @@ export default function QuizDetails() {
                 setQuizDetails(defaultQuizDetails)
             }
         }
+        const fetchAnswers = async () => {
+            if (qid && currentUser._id) {
+                const fetchedAnswers = await quizClient.getAnswersForQuiz(qid, currentUser._id);
+                setAnswers(fetchedAnswers);
+                console.log("Fetched Answers: ", fetchedAnswers);
+            }
+        }
+        if (userClient.isStudent(currentUser)) {
+            fetchAnswers();
+        }
     }, [qid, quizzes, isCreatingNew]);
 
     const navigateToQuizEditor = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/DetailEditor`, { state: { quiz: quizDetails } });
     };
+
     const navigateToQuizPreview = () => {
         navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/Preview`);
     };
+    const navigateToStudentPreview = () => {
+        navigate(`/Kanbas/Courses/${cid}/Quizzes/${qid}/view`);
+    };
+
 
     return (
         <>
@@ -87,7 +170,7 @@ export default function QuizDetails() {
             {userClient.canManageQuiz(currentUser) && (
                 <div id="wd-quizdetail" className="container mt-4">
                     <div className="ms-auto" style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-                        <button id="wd-preview-btn" className="btn btn-me btn-secondary me-3" onClick={navigateToQuizPreview}>
+                        <button id="wd-preview-btn" className="btn btn-me btn-secondary me-3" onClick={navigateToStudentPreview}>
                             Preview
                         </button>
                         <button id="wd-add-group-btn" className="btn btn-me btn-secondary me-1" onClick={navigateToQuizEditor}>
@@ -167,6 +250,17 @@ export default function QuizDetails() {
                             <td>{formatDateForInput(quizDetails.until)}</td>
                         </tbody>
                     </table>
+
+
+                    <div className="d-flex justify-content-center">
+                        <button
+                            className="btn btn-md btn-secondary mt-3 "
+                            onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes`)}
+                        >
+                            Back to Quiz List
+                        </button>
+                    </div>
+
                 </div>
             )}
 
@@ -202,17 +296,72 @@ export default function QuizDetails() {
                         {quizDetails.timeLimit}
                     </span>
 
+
+                    <div className="d-flex flex-column justify-content-center align-items-center">
+                        <p className="text-center mt-2 border">
+                            <span style={{
+                                display: 'inline-block',
+                                backgroundColor: '#f0f0f0',
+                                color: '#333',
+                                padding: '0.5rem 1rem',
+                                borderRadius: '8px',
+                                fontSize: '1.2rem',
+                                fontWeight: 'bold',
+                                border: '1px solid #ccc'
+                            }}>
+                                {quizDetails.multipleAttempts === 0
+                                    ? `${Math.max((answers?.attempt || 0) - 1, 0)}/Unlimited Attempts`
+                                    : `${Math.max((answers?.attempt || 0) - 1, 0)}/${quizDetails.multipleAttempts} attempts`}
+
+                            </span>
+                        </p>
+                        <div className="d-flex justify-content-center">
+                            <button
+                                onClick={handleNewAttempt}
+                                className="btn btn-lg btn-danger border rounded-1 ms-2">
+                                {checkAvailableDate()}
+                            </button>
+                        </div>
+
+                        {maxAttempts && (
+                            <p className="text-center mt-4">You already reach the max attempt.</p>
+                        )}
+                    </div>
+
+                    <div className="d-flex flex-column justify-content-center align-items-center mt-4">
+                        
+                        {quizDetails.showCorrectAnswers && (answers?.attempt > 0) ? ( // only show graded quiz 
+                            <>
+                                <h3>Grade:
+                                    {answers?.score !== undefined
+                                        ? answers.score
+                                        : " N/A"}</h3>
+                                <a href={`#/Kanbas/Courses/${cid}/Quizzes/${qid}/Graded`} className="btn btn-link">
+                                    Graded Quiz
+                                </a>
+                            </>
+                        ) : (
+                            answers ? (
+                                answers.finished
+                                    ? <p>Quiz not graded.</p>
+                                    : <p>Quiz not finished.</p>
+                            ) : (
+                                <p>Quiz data not available.</p>
+                            )
+                        )}
+                    </div>
                     <hr />
 
-                    <button
-                        id="wd-add-quiz-question"
-                        className="btn btn-lg btn-secondary me-1"
-                        onClick={navigateToQuizPreview}
-                        style={{ color: "white", backgroundColor: "#c83630", position: "absolute", left: "45%", marginTop: "20px" }}>
-                        Take the Quiz
-                    </button>
-
+                    <div className="d-flex justify-content-center">
+                        <button
+                            className="btn btn-md btn-secondary mt-3 "
+                            onClick={() => navigate(`/Kanbas/Courses/${cid}/Quizzes`)}
+                        >
+                            Back to Quiz List
+                        </button>
+                    </div>
                 </div>
+
             )}
         </>
     );

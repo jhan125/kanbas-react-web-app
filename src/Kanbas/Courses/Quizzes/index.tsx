@@ -9,6 +9,7 @@ import { FaSortDown } from "react-icons/fa";
 import { LuPlane } from "react-icons/lu";
 import DeleteConfirmationModal from "../Components/DeleteConfirmationModal";
 import * as userClient from "../../Account/client";
+import { IoIosInformationCircleOutline } from "react-icons/io";
 
 export default function Quizzes(
    { courses }:
@@ -108,15 +109,26 @@ export default function Quizzes(
          )}
 
          <ul id="wd-quizzes" className="list-group rounded-0">
-            <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray">
+            <li className="wd-module list-group-item p-0 mb-5 fs-5 border-gray mt-4">
                <div className="wd-title p-3 ps-2 bg-secondary d-flex align-items-center">
                   <FaSortDown className="mb-2" />
                   Assignment Quizzes
                   <div className="ms-auto">
                   </div>
                </div>
-               <ul className="wd-assignments list-group rounded-0" style={{ borderLeftWidth: "thick", borderLeftColor: "green", borderLeftStyle: "solid" }}>
+               <ul className="wd-quizzes list-group rounded-0" style={{ borderLeftWidth: "thick", borderLeftColor: "green", borderLeftStyle: "solid" }}>
+                  {quizzes.length === 0 &&
+                     <li
+                        className="wd-lesson list-group-item p-3 ps-1 justify-content-between"
+                        style={{ width: "100%" }}>
+                        <IoIosInformationCircleOutline className="fs-3 me-2" />
+                        No quizzes in this list.
+                        {currentUser.role === "FACULTY" &&
+                           " Please press the [+Quiz] button above to add quiz."}
+                     </li>}
+
                   {quizzes
+                     .filter((quiz: any) => quiz.published || userClient.canManageQuiz(currentUser)) // Include unpublished only for faculty
                      .map((quiz: any) => (
                         <li className="wd-quiz list-group-item p-3" style={{ display: 'flex', justifyContent: 'left' }}>
                            <div style={{ display: 'flex', alignItems: 'center' }}>

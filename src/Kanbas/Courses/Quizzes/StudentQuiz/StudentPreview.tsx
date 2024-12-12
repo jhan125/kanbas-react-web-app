@@ -4,26 +4,27 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import { PiWarningCircle, PiPencil } from "react-icons/pi";
 import { useNavigate } from "react-router";
-import * as client from "../../client";
-import QuizEditorButtons from "../QuizEditorButtons";
-import DisplayQuestion from "../QuestionDisplay/DisplayQuestion";
-import { updateQuizzes } from "../../QuizReducer";
-import "../styles.css";
+import * as quizClient from "../client";
+import QuizEditorButtons from "../QuizQuestionEditor/QuizEditorButtons";
+import DisplayQuestion from "../QuizQuestionEditor/QuestionDisplay/DisplayQuestion";
+import { updateQuizzes } from "../QuizReducer";
 
-export default function Preview() {
+export default function StudentPreview() {
   const location = useLocation();
   const { cid, qid } = useParams();
   const [quiz, setQuiz] = useState<any>({});
   const [questions, setQuestions] = useState<any[]>([]);
   const [userAnswers, setUserAnswers] = useState<any>({});
   const [score, setScore] = useState<number | null>(null);
+  const { currentUser } = useSelector((state: any) => state.accountReducer);
+
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   useEffect(() => {
     const fetchQuiz = async () => {
       try {
-        const fetchedQuiz = await client.findQuizById(qid as string);
+        const fetchedQuiz = await quizClient.findQuizById(qid as string);
         setQuiz(fetchedQuiz);
         setQuestions(fetchedQuiz.questions || []);
       } catch (error) {
@@ -37,31 +38,80 @@ export default function Preview() {
   console.log(quiz);
   console.log(questions);
 
-  const handleAnswerChange = (questionId: string, answer: string) => {
-    setUserAnswers({
-      ...userAnswers,
+  const handleAnswerChange = async (questionId: string, answer: string) => {
+    setUserAnswers((prevUserAnswers: any) => ({
+      ...prevUserAnswers,
       [questionId]: answer,
-    });
+    }));
   };
 
-  const handleSubmit = () => {
-    let calculatedScore = 0;
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
+    questionId: string // Pass questionId explicitly
+  ) => {
+    const { value } = e.target;
+    // const answerUpdate = { questionId: name, updateAnswer: value };
+    // if (qid) {
+    //   quizClient.addAnswerToMap(qid, currentUser._id, answerUpdate);
+    // }
+    // Use the questionId directly instead of relying on the name attribute
+    setUserAnswers((prevUserAnswers: any) => ({
+      ...prevUserAnswers,
+      [questionId]: value,
+    }));
+  };
 
-    questions.forEach((question) => {
-      const userAnswer = userAnswers[question._id];
+  // const handleSubmit = () => {
+  //   let calculatedScore = 0;
 
-      if (question.questionType === "Multiple Choice" || question.questionType === "True False") {
-        if (userAnswer === question.correctAnswer) {
-          calculatedScore += question.points;
-        }
-      } else if (question.questionType === "Fill In the Blank") {
-        if (question.answers.includes(userAnswer)) {
-          calculatedScore += question.points;
-        }
+  //   questions.forEach((question) => {
+  //     const userAnswer = userAnswers[question._id];
+
+  //     if (question.questionType === "Multiple Choice" || question.questionType === "True False") {
+  //       if (userAnswer === question.correctAnswer) {
+  //         calculatedScore += question.points;
+  //       }
+  //     } else if (question.questionType === "Fill In the Blank") {
+  //       if (question.answers.includes(userAnswer)) {
+  //         calculatedScore += question.points;
+  //       }
+  //     }
+  //   });
+  //   setScore(calculatedScore);
+  // };
+
+  const handleSubmit = async () => {
+    if (!qid || !currentUser._id) return; // Guard clause
+
+    try {
+      // Save each answer to the server before submitting
+      for (const questionId in userAnswers) {
+        const answerPayload = {
+          questionId: questionId,
+          updateAnswer: userAnswers[questionId] // matches backend naming
+        };
+
+        console.log("Submitting answer for questionId:", questionId, "Payload:", answerPayload);
+        // Add this log inside the frontend's handleSubmit:
+        console.log("Payload being sent:", JSON.stringify(answerPayload));
+
+
+        await quizClient.addAnswerToMap(qid, currentUser._id, answerPayload);
       }
-    });
 
-    setScore(calculatedScore);
+      // After all answers are saved, finalize attempt and score
+      const result = await quizClient.submitQuiz(qid, currentUser._id);
+
+      console.log("Final submission result:", result);
+
+      if (result) {
+        navigate(`/Kanbas/Courses/${cid}/quizzes/${qid}/Graded`);
+      } else {
+        console.error("Error submitting quiz");
+      }
+    } catch (error) {
+      console.error("Error during submission:", error);
+    }
   };
 
 
@@ -116,10 +166,9 @@ export default function Preview() {
     <div className="container mt-4">
 
       <div><h3><strong>{quiz.title}</strong></h3></div>
-      <div className="alert alert-danger" role="alert">
-        <PiWarningCircle className="me-2"/>
-        This is a preview of the published version of the quiz. 
-      </div>
+      {/* <div className="alert alert-danger" role="alert"><PiWarningCircle />
+        This is a preview of the published version of the quiz
+      </div> */}
 
       <div className="d-flex">
         Started:&nbsp;
@@ -154,7 +203,7 @@ export default function Preview() {
                         className="form-control"
                         type="text"
                         placeholder="Enter your answer here"
-                        onChange={(e) => handleAnswerChange(question._id, e.target.value)}
+                        onChange={(e) => handleInputChange(e, question._id)} // Explicitly pass questionId
                       />
                     ) : (
                       <ul className="list-group" style={{ marginBottom: "10px" }}>
@@ -185,8 +234,8 @@ export default function Preview() {
         </ul>
       </div>
 
-      <div className="d-flex justify-content-end align-items-center" 
-      style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "black", width: "100%", height: "55px" }}>
+      <div className="d-flex justify-content-end align-items-center"
+        style={{ borderWidth: "1px", borderStyle: "solid", borderColor: "black", width: "100%", height: "55px" }}>
         <div className="d-flex me-3">
           Quiz saved at&nbsp;
           <DateTimeDisplay />
@@ -204,16 +253,6 @@ export default function Preview() {
         </div>
       )}
       <br /><br /><br />
-
-      <div className="p-2 mb-2" style={{ backgroundColor: "#f5f5f5", width: "100%" }}>
-        <button style={{ background: "none", border: "none", color: "red", cursor: "pointer", padding: "0" }}>
-          <Link to={`/Kanbas/Courses/${cid}/Quizzes/${qid}/QuestionEditor`}
-            style={{ color: "black", textDecoration: "none" }}>
-            <PiPencil style={{ transform: "scaleX(-1)" }} />
-            Keep Editing This Quiz
-          </Link>
-        </button>
-      </div>
     </div>
   );
 }

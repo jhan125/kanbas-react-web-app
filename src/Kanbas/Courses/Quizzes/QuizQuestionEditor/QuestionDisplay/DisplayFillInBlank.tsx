@@ -10,7 +10,7 @@ export default function DisplayFillInBlank({ question }: { question: any }) {
             <ul className="list-group" style={{ marginBottom: "10px" }}>
                 {question.answers.length > 0 ? (question.answers.map((answer: string) => (
                     <li className="list-group-item" style={{ borderColor: "white",}}>
-                        Possible Answer: {answer}
+                        Correct Answer: {answer}
                     </li>
                 ))) : ""}
             </ul>
