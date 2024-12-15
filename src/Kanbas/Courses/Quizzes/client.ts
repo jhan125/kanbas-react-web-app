@@ -72,6 +72,13 @@ export const getAnswersForQuiz = async (quizId: string, userId: string) => {
     return data;
 }
 
+// get the last score linked by answer as can be found by userid and quizid
+export const getScoreForQuiz = async (quizId: string, userId: string) => {
+    const { data }  = await axiosWithCredentials.get(`${QUIZZES_API}/${quizId}/user/${userId}/score`);
+    return data;
+}
+
+
 // export const updateAnswer = async (quizId: string, userId: string, updateAnswer: any) => {
 //     const { data } = await axiosWithCredentials.put(`${QUIZZES_API}/${quizId}/user/${userId}/answers/update`, updateAnswer);
 //     return data;

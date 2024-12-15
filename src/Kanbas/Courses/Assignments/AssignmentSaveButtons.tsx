@@ -42,7 +42,7 @@ export default function AssignmentSaveButtons({
     if (isNaN(date.getTime())) return ""; // invalid date
 
     // extract individual components
-    const month = date.toLocaleString("en-US", { month: "short" });
+    const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC"});
     const day = date.getDate();
     let hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, "0");

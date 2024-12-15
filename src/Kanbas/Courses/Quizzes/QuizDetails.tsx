@@ -60,7 +60,7 @@ export default function QuizDetails() {
             return `Closed`;
         }
         else {
-            return "Begin Quiz";
+            return "Start the Quiz";
         }
     };
 
@@ -77,10 +77,10 @@ export default function QuizDetails() {
         if (isNaN(date.getTime())) return ""; // invalid date
 
         // extract individual components
-        const month = date.toLocaleString("en-US", { month: "short" });
-        const day = date.getDate();
-        let hours = date.getHours();
-        const minutes = date.getMinutes().toString().padStart(2, "0");
+        const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+        const day = date.getUTCDate();
+        let hours = date.getUTCHours();
+        const minutes = date.getUTCMinutes().toString().padStart(2, "0");
 
         // AM/PM for 12-hour format
         const ampm = hours >= 12 ? "pm" : "am";
@@ -248,7 +248,7 @@ export default function QuizDetails() {
                 </div>
             )}
 
-            {/* Faculty / Admin can't manage Quiz but can Take Quiz */}
+            {/* Student can't manage Quiz but can Take Quiz */}
             {userClient.isStudent(currentUser) && (
                 <div className="container mt-4">
 
@@ -282,7 +282,7 @@ export default function QuizDetails() {
 
 
                     <div className="d-flex flex-column justify-content-center align-items-center">
-                        <p className="text-center mt-2 border">
+                        <div className="text-center mt-2 border">
                             <span style={{
                                 display: 'inline-block',
                                 backgroundColor: '#f0f0f0',
@@ -298,7 +298,9 @@ export default function QuizDetails() {
                                     : `${(answers?.attempt || 0)}/${quizDetails.multipleAttempts} attempts`}
 
                             </span>
-                        </p>
+
+
+                        </div>
                         <div className="d-flex justify-content-center">
                             <button
                                 onClick={handleNewAttempt}

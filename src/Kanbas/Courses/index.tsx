@@ -55,7 +55,7 @@ export default function Courses() {
             <Route path="Quizzes/:qid/DetailEditor" element={<QuizEditor />} />
             <Route path="Quizzes/:qid/QuestionEditor" element={<QuizQuestionsEditor />} />
             <Route path="Quizzes/:qid/QuestionEditor/new" element={<Selector />} />
-            <Route path="Quizzes/:qid/Preview" element={<Preview />} />
+            {/* <Route path="Quizzes/:qid/Preview" element={<Preview />} /> */}
             <Route path="Quizzes/:qid/view" element={<QuizOneAtATime />} />
             <Route path="Quizzes/:qid/Graded" element={<GradedQuiz />} />
           </Routes>

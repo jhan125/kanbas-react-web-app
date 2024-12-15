@@ -10,6 +10,7 @@ export default function GradedQuiz() {
   const [quiz, setQuiz] = useState<any>({});
   const [questions, setQuestions] = useState<any[]>([]);
   const [userAnswers, setUserAnswers] = useState<any>({});
+  const [userAnswerDate, setUserAnswerDate] = useState<any>({});
   const [score, setScore] = useState<number | null>(null);
   const { currentUser } = useSelector((state: any) => state.accountReducer);
   const navigate = useNavigate();
@@ -25,6 +26,7 @@ export default function GradedQuiz() {
         // Fetch user answers
         const result = await quizClient.getAnswersForQuiz(qid as string, currentUser._id as string);
         setUserAnswers(result.answers);
+        setUserAnswerDate(result.date);
         setScore(result.score);
       } catch (error) {
         console.error("Error fetching quiz or user answers:", error);
@@ -34,6 +36,25 @@ export default function GradedQuiz() {
     fetchQuizAndAnswers();
   }, [qid, currentUser._id]);
 
+  const formatDateTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) return ""; // invalid date
+
+    // extract individual components
+    const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+    const day = date.getDate();
+    let hours = date.getHours();
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    // AM/PM for 12-hour format
+    const ampm = hours >= 12 ? "pm" : "am";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // Convert 0 to 12 for midnight
+
+    // format string
+    return `${month} ${day} at ${hours}:${minutes}${ampm}`;
+  };
+
   return (
     <div className="container mt-4">
       <div>
@@ -42,12 +63,12 @@ export default function GradedQuiz() {
         </h3>
       </div>
 
-      {/* <div className="d-flex">
-        <strong>Score:</strong>&nbsp;
+      <div>
+          Date Submitted:&nbsp;
         <span>
-          {score} / {quiz.points}
+          {formatDateTime(userAnswerDate)}
         </span>
-      </div> */}
+      </div>
 
       <div className="d-flex bg-light border p-2 rounded mt-3">
         <strong style={{ fontSize: '1.2em', fontWeight: 'bold', color: 'green' }}>Score:</strong>&nbsp;
@@ -139,9 +160,9 @@ export default function GradedQuiz() {
                       {score !== null && (
                         <div>
                           {isCorrect ? (
-                            <span style={{ color: "green" }}>✔ Correct</span>
+                            <span style={{ color: "green" }}> ✔ Correct</span>
                           ) : (
-                            <span style={{ color: "red" }}>✘ Incorrect</span>
+                            <span style={{ color: "red" }}> ✘ Incorrect</span>
                           )}
                         </div>
                       )}

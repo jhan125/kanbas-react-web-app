@@ -33,12 +33,9 @@ export default function Quizzes(
          quizzes.forEach((quiz: any) => console.log("Print out all quizzes titles: ", quiz.title));
       };
       fetchQuizzes();
-   }, [cid, dispatch]);
 
-   // const removeQuiz = async (quizId: string) => {
-   //    await client.deleteQuiz(quizId);
-   //    dispatch(deleteQuizzes(quizId));
-   // };
+   }, [cid, dispatch, currentUser._id]);
+
    const removeQuiz = async () => {
       if (selectedQuizId) {
          await client.deleteQuiz(selectedQuizId);
@@ -83,7 +80,7 @@ export default function Quizzes(
       if (isNaN(date.getTime())) return "";
 
       // extract individual components
-      const month = date.toLocaleString("en-US", { month: "short" });
+      const month = date.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
       const day = date.getDate();
       let hours = date.getHours();
       const minutes = date.getMinutes().toString().padStart(2, "0");
@@ -160,6 +157,11 @@ export default function Quizzes(
                               <span className="text-muted m-2">
                                  {quiz.questions.length} Questions
                               </span>
+                              {/* {userClient.isStudent(currentUser) && (
+                                 <span className="text-muted m-2">
+                                    {quiz.points} pts
+                                 </span>
+                              )} */}
                            </div>
 
                            {userClient.canManageQuiz(currentUser) && (
